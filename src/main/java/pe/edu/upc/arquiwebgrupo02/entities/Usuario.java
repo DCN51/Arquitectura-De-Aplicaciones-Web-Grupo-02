@@ -5,12 +5,12 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity //nombre de la tabla en la base de datos
-@Table(name = "usuario")
+@Table(name = "usuarios")
 public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "usuario_id")
-    private int usuarioId;
+    private Long usuarioId;
 
     @Column(name = "nameUser", length = 50, nullable = false)
     private String nombre;
@@ -48,7 +48,7 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(int usuarioId, String nombre, String apellidos, String correoElectronico, String contrasenia, String telefono, LocalDate fechaNacimiento, String genero, String numeroColegiatura, String especializacion, int aniosExperiencia, String estado) {
+    public Usuario(Long usuarioId, String nombre, String apellidos, String correoElectronico, String contrasenia, String telefono, LocalDate fechaNacimiento, String genero, String numeroColegiatura, String especializacion, int aniosExperiencia, String estado) {
         this.usuarioId = usuarioId;
         this.nombre = nombre;
         this.apellidos = apellidos;
@@ -63,11 +63,11 @@ public class Usuario {
         this.estado = estado;
     }
 
-    public int getUsuarioId() {
+    public Long getUsuarioId() {
         return usuarioId;
     }
 
-    public void setUsuarioId(int usuarioId) {
+    public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
     }
 
