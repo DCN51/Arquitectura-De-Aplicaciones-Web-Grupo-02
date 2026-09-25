@@ -1,53 +1,35 @@
-package pe.edu.upc.arquiwebgrupo02.entities;
+package pe.edu.upc.arquiwebgrupo02.dtos;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
+public class CatalogoPlanDTO {
 
 
-public class CatalogoPlan {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "catalogoPlanId")
     private Long catalogoPlanId;
 
-    @Column(name = "nombreCatalogoPlan", length = 100,nullable = false)
+    @NotBlank(message = "El nombre del plan es obligatorio")
     private String nombreCatalogoPlan;
 
-    @Column(name = "precioMensualCatalogoPlan",nullable = false)
+    // PositiveOrZero porque el plan free cuesta 0
+    @PositiveOrZero(message = "El precio no puede ser negativo")
     private double precioMensualCatalogoPlan;
 
-    @Column(name = "limiteSesionesMes")
+    // -1 = sesiones ilimitadas
     private int limiteSesionesMes;
 
-    @Column(name = "incluyeDiagnostico",nullable = false)
     private boolean incluyeDiagnostico;
 
-    @Column(name = "incluyeActividades",nullable = false)
     private boolean incluyeActividades;
 
-    @Column(name = "permiteDerivacion",nullable = false)
     private boolean permiteDerivacion;
 
-    @Column(name = "descripcionCatalogoPlan",nullable = false)
+    @NotBlank(message = "La descripción del plan es obligatoria")
     private String descripcionCatalogoPlan;
 
-    @Column(name = "activoCatalogoPlan", nullable = false)
     private boolean activoCatalogoPlan;
-
-    public CatalogoPlan() {
-    }
-
-    public CatalogoPlan(Long catalogoPlanId, String nombreCatalogoPlan, double precioMensualCatalogoPlan, int limiteSesionesMes, boolean incluyeDiagnostico, boolean incluyeActividades, boolean permiteDerivacion, String descripcionCatalogoPlan, boolean activoCatalogoPlan) {
-        this.catalogoPlanId = catalogoPlanId;
-        this.nombreCatalogoPlan = nombreCatalogoPlan;
-        this.precioMensualCatalogoPlan = precioMensualCatalogoPlan;
-        this.limiteSesionesMes = limiteSesionesMes;
-        this.incluyeDiagnostico = incluyeDiagnostico;
-        this.incluyeActividades = incluyeActividades;
-        this.permiteDerivacion = permiteDerivacion;
-        this.descripcionCatalogoPlan = descripcionCatalogoPlan;
-        this.activoCatalogoPlan = activoCatalogoPlan;
-    }
 
     public Long getCatalogoPlanId() {
         return catalogoPlanId;
@@ -120,4 +102,6 @@ public class CatalogoPlan {
     public void setActivoCatalogoPlan(boolean activoCatalogoPlan) {
         this.activoCatalogoPlan = activoCatalogoPlan;
     }
+
+
 }

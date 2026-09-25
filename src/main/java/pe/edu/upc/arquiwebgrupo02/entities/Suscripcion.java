@@ -4,13 +4,12 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "suscripciones" )
+
 public class Suscripcion {
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     @Column(name = "suscripcionId")
-    private int suscripcionId;
+    private Long suscripcionId;
 
     @Column(name = "fechaInicio", nullable = false)
     private LocalDate fechaInicio;
@@ -38,7 +37,7 @@ public class Suscripcion {
     public Suscripcion() {
     }
 
-    public Suscripcion(int suscripcionId, LocalDate fechaInicio, LocalDate fechaFin, String estadoSuscripcion, String metodoPagoSuscripcion, String referenciaPagoSuscripcion, Usuario usuario, CatalogoPlan catalogoPlan) {
+    public Suscripcion(Long suscripcionId, LocalDate fechaInicio, LocalDate fechaFin, String estadoSuscripcion, String metodoPagoSuscripcion, String referenciaPagoSuscripcion, Usuario usuario, CatalogoPlan catalogoPlan) {
         this.suscripcionId = suscripcionId;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
@@ -49,11 +48,11 @@ public class Suscripcion {
         this.catalogoPlan = catalogoPlan;
     }
 
-    public int getSuscripcionId() {
+    public Long getSuscripcionId() {
         return suscripcionId;
     }
 
-    public void setSuscripcionId(int suscripcionId) {
+    public void setSuscripcionId(Long suscripcionId) {
         this.suscripcionId = suscripcionId;
     }
 
