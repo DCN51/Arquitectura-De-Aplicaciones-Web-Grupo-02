@@ -1,4 +1,4 @@
-package pe.edu.upc.arquiwebgrupo02.servicesImplements;
+package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 
 public class ActividadRecomendadaServiceImplement {
 }

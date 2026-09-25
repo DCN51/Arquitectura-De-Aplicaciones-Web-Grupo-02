@@ -1,12 +1,13 @@
 package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import pe.edu.upc.arquiwebgrupo02.entities.CatalogoPlan;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.arquiwebgrupo02.entities.Suscripcion;
 import pe.edu.upc.arquiwebgrupo02.repositories.ICatalogoPlanRepository;
 import pe.edu.upc.arquiwebgrupo02.repositories.ISuscripcionRepository;
-import pe.edu.upc.arquiwebgrupo02.repositories.IUsuarioRepository;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.ISuscripcionService;
 
 import java.time.LocalDate;
@@ -15,12 +16,10 @@ import java.util.List;
 @Service
 public class SuscripcionServiceImplement implements ISuscripcionService {
     private final ISuscripcionRepository sR;
-    private final IUsuarioRepository uR;
     private final ICatalogoPlanRepository cpR;
 
-    public SuscripcionServiceImplement(ISuscripcionRepository sR, IUsuarioRepository uR, ICatalogoPlanRepository cpR) {
+    public SuscripcionServiceImplement(ISuscripcionRepository sR, ICatalogoPlanRepository cpR) {
         this.sR = sR;
-        this.uR = uR;
         this.cpR = cpR;
     }
 
@@ -29,8 +28,8 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
     @Override
     public void insert(Suscripcion s) {
         // Si ya tiene una activa, no puede contratar otra
-        if (sR.buscarActivaPorUsuario(s.getUsuario().getUsuarioId()) != null) {
-            throw new RuntimeException("Ya tienes una suscripción activa");
+        if (sR.buscarActivaPorUsuario(s.getUsuario().getId()) != null) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya tienes una suscripción activa");
         }
         guardarNueva(s);
     }
@@ -44,15 +43,15 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
     @Override
     @Transactional
     public void cambiarPlan(Suscripcion s) {
-        Suscripcion actual = sR.buscarActivaPorUsuario(s.getUsuario().getUsuarioId());
+        Suscripcion actual = sR.buscarActivaPorUsuario(s.getUsuario().getId());
 
         // Para cambiar, primero debe tener una activa
         if (actual == null) {
-            throw new RuntimeException("No tienes una suscripción activa");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tienes una suscripción activa");
         }
         // No tiene sentido cambiar al mismo plan
         if (actual.getCatalogoPlan().getCatalogoPlanId().equals(s.getCatalogoPlan().getCatalogoPlanId())) {
-            throw new RuntimeException("Ya estás suscrito a este plan");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya estás suscrito a este plan");
         }
 
         // Se cancela la anterior y se guarda la nueva
@@ -66,7 +65,7 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
     public void cancelar(Long usuarioId) {
         Suscripcion s = sR.buscarActivaPorUsuario(usuarioId);
         if (s == null) {
-            throw new RuntimeException("No tienes una suscripción activa");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No tienes una suscripción activa");
         }
         s.setEstadoSuscripcion("cancelada");
         sR.save(s);
@@ -82,10 +81,11 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
     private void guardarNueva(Suscripcion s) {
         // 1. Buscar el plan elegido y verificar que se pueda contratar
         CatalogoPlan plan = cpR.findById(s.getCatalogoPlan().getCatalogoPlanId())
-                .orElseThrow(() -> new RuntimeException("Plan no encontrado"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Plan no encontrado"));
         if (!plan.isActivoCatalogoPlan()) {
-            throw new RuntimeException("El plan no está disponible");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El plan no está disponible");
         }
+
         // 2. Llenar lo que decide el sistema, no el cliente
         s.setCatalogoPlan(plan);
         s.setFechaInicio(LocalDate.now());

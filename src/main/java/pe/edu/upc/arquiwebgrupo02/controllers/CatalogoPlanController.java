@@ -20,7 +20,7 @@ public class CatalogoPlanController {
     private final ICatalogoPlanService cpS;
     private final ModelMapper modelMapper;
 
-    public CatalogoPlanController(ICatalogoPlanService cPS, ICatalogoPlanService cpS, ModelMapper modelMapper) {
+    public CatalogoPlanController(ICatalogoPlanService cpS, ModelMapper modelMapper) {
         this.cpS = cpS;
         this.modelMapper = modelMapper;
     }
@@ -78,6 +78,7 @@ public class CatalogoPlanController {
                 );
         CatalogoPlan c = modelMapper.map(dto, CatalogoPlan.class);
         c.setCatalogoPlanId(existente.getCatalogoPlanId());
+        c.setActivoCatalogoPlan(dto.isActivoCatalogoPlan() || existente.isActivoCatalogoPlan());
         cpS.update(c);
 
         return ResponseEntity.ok(modelMapper.map(c, CatalogoPlanDTO.class));

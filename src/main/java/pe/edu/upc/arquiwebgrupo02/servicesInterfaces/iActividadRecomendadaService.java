@@ -1,4 +1,4 @@
-package pe.edu.upc.arquiwebgrupo02.servicesInterfaces;
+package pe.edu.upc.arquiwebgrupo02.servicesinterfaces;
 
-public class iActividadRecomendadaService {
+public interface IActividadRecomendadaService {
 }

@@ -1,6 +1,5 @@
 package pe.edu.upc.arquiwebgrupo02.dtos;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;

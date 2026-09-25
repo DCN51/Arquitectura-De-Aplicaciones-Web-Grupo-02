@@ -1,6 +1,7 @@
 package pe.edu.upc.arquiwebgrupo02.entities;
 
 import jakarta.persistence.*;
+import org.apache.catalina.User;
 
 import java.time.LocalDate;
 
@@ -14,7 +15,7 @@ public class ActividadRecomendada {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuarioId", nullable = false)
-    private Usuario usuario;
+    private Users user;
 
     @Column(name = "diagnosticoId", nullable = false)
     private int diagnosticoId;
@@ -43,11 +44,11 @@ public class ActividadRecomendada {
     public ActividadRecomendada() {
     }
 
-    public ActividadRecomendada(int actividadId, Usuario usuario, int diagnosticoId, String titulo, String descripcion,
+    public ActividadRecomendada(int actividadId, Users user, int diagnosticoId, String titulo, String descripcion,
                                 String tipo, LocalDate fechaAsignacion, LocalDate fechaCompletada, String estado,
                                 String feedbackUsuario) {
         this.actividadId = actividadId;
-        this.usuario = usuario;
+        this.user = user;
         this.diagnosticoId = diagnosticoId;
         this.titulo = titulo;
         this.descripcion = descripcion;
@@ -66,12 +67,12 @@ public class ActividadRecomendada {
         this.actividadId = actividadId;
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    public Users getUsuario() {
+        return user;
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setUsuario(Users user) {
+        this.user = user;
     }
 
     public int getDiagnosticoId() {

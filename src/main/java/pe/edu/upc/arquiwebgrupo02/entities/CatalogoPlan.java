@@ -2,7 +2,8 @@ package pe.edu.upc.arquiwebgrupo02.entities;
 
 import jakarta.persistence.*;
 
-
+@Entity
+@Table(name = "catalogoplanes")
 public class CatalogoPlan {
 
     @Id

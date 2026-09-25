@@ -8,11 +8,11 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.arquiwebgrupo02.dtos.SuscripcionDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.CatalogoPlan;
 import pe.edu.upc.arquiwebgrupo02.entities.Suscripcion;
-import pe.edu.upc.arquiwebgrupo02.entities.Usuario;
+import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.exceptions.ResourceNotFoundException;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.ICatalogoPlanService;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.ISuscripcionService;
-import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUsuarioService;
+import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService;
 
 import java.net.URI;
 import java.util.List;
@@ -22,11 +22,11 @@ import java.util.List;
 public class SuscripcionController {
     private final ISuscripcionService sS;
     private final ModelMapper modelMapper;
-    private final IUsuarioService uS;
+    private final IUserService uS;
     private final ICatalogoPlanService cpS;
 
     public SuscripcionController(ISuscripcionService sS, ModelMapper modelMapper,
-                                 IUsuarioService uS, ICatalogoPlanService cpS) {
+                                 IUserService uS, ICatalogoPlanService cpS) {
         this.sS = sS;
         this.modelMapper = modelMapper;
         this.uS = uS;
@@ -97,7 +97,7 @@ public class SuscripcionController {
     // Busca el usuario y el plan (como hace la profesora con el invernadero)
     // y arma la suscripcion. Las fechas y el estado los pone el servicio.
     private Suscripcion armarSuscripcion(SuscripcionDTO dto) {
-        Usuario u = uS.listId(dto.getUsuarioId())
+        Users u = uS.listId(dto.getUsuarioId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
                                 "No existe el usuario con el id: " + dto.getUsuarioId()

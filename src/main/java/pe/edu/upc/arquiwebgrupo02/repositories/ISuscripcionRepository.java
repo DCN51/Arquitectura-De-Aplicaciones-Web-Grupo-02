@@ -9,11 +9,6 @@ import java.util.List;
 
 public interface ISuscripcionRepository extends JpaRepository<Suscripcion, Long> {
 
-    // US05: cuantas suscripciones activas tiene el usuario (0 o 1)
-    @Query(value = "select count(*) from suscripciones " +
-            " where usuario_id = :usuarioId and estado_suscripcion = 'activa'", nativeQuery = true)
-    public int contarActivasPorUsuario(@Param("usuarioId") Long usuarioId);
-
     // US06 y US07: la suscripcion activa del usuario
     @Query(value = "select * from suscripciones " +
             " where usuario_id = :usuarioId and estado_suscripcion = 'activa'" +

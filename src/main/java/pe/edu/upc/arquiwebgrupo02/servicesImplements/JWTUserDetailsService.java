@@ -1,4 +1,4 @@
-package pe.edu.upc.arquiwebgrupo02.servicesImplements;
+package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -8,16 +8,16 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
-import pe.edu.upc.arquiwebgrupo02.repository.iUsuarioRepository;
+import pe.edu.upc.arquiwebgrupo02.repositories.IUsuarioRepository;
 
 import java.util.Locale;
 
 @Service
 public class JWTUserDetailsService implements UserDetailsService {
 
-    private final iUsuarioRepository usersRepository;
+    private final IUsuarioRepository usersRepository;
 
-    public JWTUserDetailsService(iUsuarioRepository usersRepository) {
+    public JWTUserDetailsService(IUsuarioRepository usersRepository) {
         this.usersRepository = usersRepository;
     }
 

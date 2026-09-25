@@ -3,7 +3,6 @@ package pe.edu.upc.arquiwebgrupo02.servicesinterfaces;
 import pe.edu.upc.arquiwebgrupo02.entities.Suscripcion;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ISuscripcionService {
 

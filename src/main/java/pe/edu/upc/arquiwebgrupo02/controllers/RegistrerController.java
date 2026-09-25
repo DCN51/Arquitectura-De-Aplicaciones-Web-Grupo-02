@@ -9,14 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 import pe.edu.upc.arquiwebgrupo02.dtos.CreateUserRequestDTO;
 import pe.edu.upc.arquiwebgrupo02.dtos.CreateUserResponseDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
-import pe.edu.upc.arquiwebgrupo02.servicesInterfaces.iUserService;
 
 @RestController
 @RequestMapping("/usuarios")
 public class RegistrerController {
-    private final iUserService usuarioService;
+    private final pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService usuarioService;
 
-    public RegistrerController(iUserService usuarioService) {
+    public RegistrerController(pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
