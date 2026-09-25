@@ -2,7 +2,7 @@ package pe.edu.upc.arquiwebgrupo02.dtos;
 
 import java.time.LocalDate;
 
-public class RegistroUsuarioDTO {
+public class CreateUserRequestDTO {
     private String username;
     private Long rolId;
     private String nombres;

@@ -1,11 +1,11 @@
 package pe.edu.upc.arquiwebgrupo02.dtos;
 
-public class RegistroUsuarioResponseDTO {
+public class CreateUserResponseDTO {
     private final Long usuarioId;
     private final String username;
     private final String rol;
 
-    public RegistroUsuarioResponseDTO(Long usuarioId, String username, String rol) {
+    public CreateUserResponseDTO(Long usuarioId, String username, String rol) {
         this.usuarioId = usuarioId;
         this.username = username;
         this.rol = rol;

@@ -5,7 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import pe.edu.upc.arquiwebgrupo02.dtos.RegistroUsuarioDTO;
+import pe.edu.upc.arquiwebgrupo02.dtos.CreateUserRequestDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.Role;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.repository.iRoleRepository;
@@ -32,7 +32,7 @@ public class UserServiceImplement implements iUserService {
 
     @Override
     @Transactional
-    public Users registrar(RegistroUsuarioDTO registro) {
+    public Users registrar(CreateUserRequestDTO registro) {
         if (registro == null
                 || isBlank(registro.getUsername())
                 || isBlank(registro.getContrasena())

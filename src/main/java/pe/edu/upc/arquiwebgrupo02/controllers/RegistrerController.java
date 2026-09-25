@@ -6,26 +6,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pe.edu.upc.arquiwebgrupo02.dtos.RegistroUsuarioDTO;
-import pe.edu.upc.arquiwebgrupo02.dtos.RegistroUsuarioResponseDTO;
+import pe.edu.upc.arquiwebgrupo02.dtos.CreateUserRequestDTO;
+import pe.edu.upc.arquiwebgrupo02.dtos.CreateUserResponseDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.servicesInterfaces.iUserService;
 
 @RestController
 @RequestMapping("/usuarios")
-public class UsuarioController {
+public class RegistrerController {
     private final iUserService usuarioService;
 
-    public UsuarioController(iUserService usuarioService) {
+    public RegistrerController(iUserService usuarioService) {
         this.usuarioService = usuarioService;
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<RegistroUsuarioResponseDTO> registrar(
-            @RequestBody RegistroUsuarioDTO registro) {
+    public ResponseEntity<CreateUserResponseDTO> registrar(
+            @RequestBody CreateUserRequestDTO registro) {
         Users user = usuarioService.registrar(registro);
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                new RegistroUsuarioResponseDTO(
+                new CreateUserResponseDTO(
                         user.getId(),
                         user.getUsername(),
                         user.getRole().getRol()
