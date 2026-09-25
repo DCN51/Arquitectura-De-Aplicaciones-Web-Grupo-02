@@ -5,19 +5,19 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "actividadRecomendadas")
+@Table(name = "actividadRecomendada")
 public class ActividadRecomendada {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "atividadId")
-    private Long actividadId;
+    @Column(name = "NatividadId")
+    private int actividadId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuarioId", nullable = false)
     private Usuario usuario;
 
     @Column(name = "diagnosticoId", nullable = false)
-    private Long diagnosticoId;
+    private int diagnosticoId;
 
     @Column(name = "titulo", length = 100, nullable = false)
     private String titulo;
@@ -43,7 +43,7 @@ public class ActividadRecomendada {
     public ActividadRecomendada() {
     }
 
-    public ActividadRecomendada(Long actividadId, Usuario usuario, Long diagnosticoId, String titulo, String descripcion,
+    public ActividadRecomendada(int actividadId, Usuario usuario, int diagnosticoId, String titulo, String descripcion,
                                 String tipo, LocalDate fechaAsignacion, LocalDate fechaCompletada, String estado,
                                 String feedbackUsuario) {
         this.actividadId = actividadId;
@@ -58,11 +58,11 @@ public class ActividadRecomendada {
         this.feedbackUsuario = feedbackUsuario;
     }
 
-    public Long getActividadId() {
+    public int getActividadId() {
         return actividadId;
     }
 
-    public void setActividadId(Long actividadId) {
+    public void setActividadId(int actividadId) {
         this.actividadId = actividadId;
     }
 
@@ -74,11 +74,11 @@ public class ActividadRecomendada {
         this.usuario = usuario;
     }
 
-    public Long getDiagnosticoId() {
+    public int getDiagnosticoId() {
         return diagnosticoId;
     }
 
-    public void setDiagnosticoId(Long diagnosticoId) {
+    public void setDiagnosticoId(int diagnosticoId) {
         this.diagnosticoId = diagnosticoId;
     }
 
