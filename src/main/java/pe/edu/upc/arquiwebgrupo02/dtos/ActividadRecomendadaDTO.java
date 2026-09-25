@@ -1,62 +1,41 @@
-package pe.edu.upc.arquiwebgrupo02.entities;
+package pe.edu.upc.arquiwebgrupo02.dtos;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "actividadesRecomendadas")
-public class ActividadRecomendada {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "activityId")
+public class ActividadRecomendadaDTO {
     private Integer actividadId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private Users usuario;
+    @NotNull(message = "El usuario es obligatorio")
+    @Positive(message = "El identificador del usuario debe ser positivo")
+    private Long usuarioId;
 
-    @Column(name = "diagnosisId")
+    @NotNull(message = "El diagnóstico es obligatorio")
+    @Positive(message = "El identificador del diagnóstico debe ser positivo")
     private Integer diagnosticoId;
 
-    @Column(name = "title", length = 200)
+    @NotBlank(message = "El título es obligatorio")
+    @Size(max = 200, message = "El título no puede superar los 200 caracteres")
     private String titulo;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @NotBlank(message = "La descripción es obligatoria")
     private String descripcion;
 
-    @Column(name = "type", length = 30)
+    @NotBlank(message = "El tipo es obligatorio")
+    @Size(max = 30, message = "El tipo no puede superar los 30 caracteres")
     private String tipo;
 
-    @Column(name = "assignmentDate", columnDefinition = "DATE default CURRENT_DATE")
     private LocalDate fechaAsignacion;
-
-    @Column(name = "completionDate")
     private LocalDate fechaCompletada;
 
-    @Column(name = "status", length = 20, columnDefinition = "VARCHAR(20) default 'pending'")
+    @Size(max = 20, message = "El estado no puede superar los 20 caracteres")
     private String estado;
 
-    @Column(name = "userFeedback", columnDefinition = "TEXT")
     private String feedbackUsuario;
-
-    public ActividadRecomendada() {
-    }
-
-    public ActividadRecomendada(Integer actividadId, Users usuario, Integer diagnosticoId, String titulo, String descripcion,
-                                String tipo, LocalDate fechaAsignacion, LocalDate fechaCompletada, String estado,
-                                String feedbackUsuario) {
-        this.actividadId = actividadId;
-        this.usuario = usuario;
-        this.diagnosticoId = diagnosticoId;
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.tipo = tipo;
-        this.fechaAsignacion = fechaAsignacion;
-        this.fechaCompletada = fechaCompletada;
-        this.estado = estado;
-        this.feedbackUsuario = feedbackUsuario;
-    }
 
     public Integer getActividadId() {
         return actividadId;
@@ -66,12 +45,12 @@ public class ActividadRecomendada {
         this.actividadId = actividadId;
     }
 
-    public Users getUsuario() {
-        return usuario;
+    public Long getUsuarioId() {
+        return usuarioId;
     }
 
-    public void setUsuario(Users usuario) {
-        this.usuario = usuario;
+    public void setUsuarioId(Long usuarioId) {
+        this.usuarioId = usuarioId;
     }
 
     public Integer getDiagnosticoId() {
