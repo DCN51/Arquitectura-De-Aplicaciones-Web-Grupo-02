@@ -1,141 +1,138 @@
 package pe.edu.upc.arquiwebgrupo02.entities;
 
 import jakarta.persistence.*;
-import org.apache.catalina.User;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "actividadRecomendada")
-public class ActividadRecomendada {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "NatividadId")
-    private int actividadId;
+//@Entity
+//@Table(name = "actividadesRecomendadas")
+//public class ActividadRecomendada {
+    //@Id
+//@GeneratedValue(strategy = GenerationType.IDENTITY)
+//@Column(name = "activityId")
+//private Integer actividadId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuarioId", nullable = false)
-    private Users user;
+//@ManyToOne(fetch = FetchType.LAZY)
+//@JoinColumn(name = "userId")
+//private Users usuario;
 
-    @Column(name = "diagnosticoId", nullable = false)
-    private int diagnosticoId;
+//@Column(name = "diagnosisId")
+//private Integer diagnosticoId;
 
-    @Column(name = "titulo", length = 100, nullable = false)
-    private String titulo;
+//@Column(name = "title", length = 200)
+//private String titulo;
 
-    @Column(name = "descripcion", length = 255, nullable = false)
-    private String descripcion;
+//@Column(name = "description", columnDefinition = "TEXT")
+//private String descripcion;
 
-    @Column(name = "tipo", length = 50, nullable = false)
-    private String tipo;
+        //@Column(name = "type", length = 30)
+//private String tipo;
 
-    @Column(name = "fechaAsignacion", nullable = false)
-    private LocalDate fechaAsignacion;
+//@Column(name = "assignmentDate", columnDefinition = "DATE default CURRENT_DATE")
+//private LocalDate fechaAsignacion;
 
-    @Column(name = "fechaCompletada")
-    private LocalDate fechaCompletada;
+//@Column(name = "completionDate")
+//private LocalDate fechaCompletada;
 
-    @Column(name = "estado", length = 30, nullable = false)
-    private String estado;
+//@Column(name = "status", length = 20, columnDefinition = "VARCHAR(20) default 'pending'")
+//private String estado;
 
-    @Column(name = "feedbackUser", length = 255)
-    private String feedbackUsuario;
+//@Column(name = "userFeedback", columnDefinition = "TEXT")
+//private String feedbackUsuario;
 
-    public ActividadRecomendada() {
-    }
+//public ActividadRecomendada() {
+//}
 
-    public ActividadRecomendada(int actividadId, Users user, int diagnosticoId, String titulo, String descripcion,
-                                String tipo, LocalDate fechaAsignacion, LocalDate fechaCompletada, String estado,
-                                String feedbackUsuario) {
-        this.actividadId = actividadId;
-        this.user = user;
-        this.diagnosticoId = diagnosticoId;
-        this.titulo = titulo;
-        this.descripcion = descripcion;
-        this.tipo = tipo;
-        this.fechaAsignacion = fechaAsignacion;
-        this.fechaCompletada = fechaCompletada;
-        this.estado = estado;
-        this.feedbackUsuario = feedbackUsuario;
-    }
+// public ActividadRecomendada(Integer actividadId, Users usuario, Integer diagnosticoId, String titulo, String descripcion,
+//String tipo, LocalDate fechaAsignacion, LocalDate fechaCompletada, String estado,
+//String feedbackUsuario) {
 
-    public int getActividadId() {
-        return actividadId;
-    }
+    //this.actividadId = actividadId;
+        //this.usuario = usuario;
+        //this.diagnosticoId = diagnosticoId;
+        //this.titulo = titulo;
+//this.descripcion = descripcion;
+//this.tipo = tipo;
+//this.fechaAsignacion = fechaAsignacion;
+//this.fechaCompletada = fechaCompletada;
+//this.estado = estado;
+//this.feedbackUsuario = feedbackUsuario;
+//}
 
-    public void setActividadId(int actividadId) {
-        this.actividadId = actividadId;
-    }
+//public Integer getActividadId() {
+//return actividadId;
+//
 
-    public Users getUsuario() {
-        return user;
-    }
+//public void setActividadId(Integer actividadId) {
+//this.actividadId = actividadId;
+//}
 
-    public void setUsuario(Users user) {
-        this.user = user;
-    }
+//public Users getUsuario() {
+//return usuario;
+//}
 
-    public int getDiagnosticoId() {
-        return diagnosticoId;
-    }
+//public void setUsuario(Users usuario) {
+//this.usuario = usuario;
+//}
 
-    public void setDiagnosticoId(int diagnosticoId) {
-        this.diagnosticoId = diagnosticoId;
-    }
+//public Integer getDiagnosticoId() {
+//return diagnosticoId;
+//}
 
-    public String getTitulo() {
-        return titulo;
-    }
+//public void setDiagnosticoId(Integer diagnosticoId) {
+//this.diagnosticoId = diagnosticoId;
+//}
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
+//public String getTitulo() {
+//return titulo;
+//}
 
-    public String getDescripcion() {
-        return descripcion;
-    }
+//public void setTitulo(String titulo) {
+//this.titulo = titulo;
+//}
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
+//public String getDescripcion() { return descripcion;}
 
-    public String getTipo() {
-        return tipo;
-    }
+//public void setDescripcion(String descripcion) {
+//this.descripcion = descripcion;
+//}
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
+//public String getTipo() {
+//  return tipo;
+//    }
 
-    public LocalDate getFechaAsignacion() {
-        return fechaAsignacion;
-    }
+//    public void setTipo(String tipo) {
+        ////    this.tipo = tipo;
+//    }
 
-    public void setFechaAsignacion(LocalDate fechaAsignacion) {
-        this.fechaAsignacion = fechaAsignacion;
-    }
+//  public LocalDate getFechaAsignacion() {
+//       return fechaAsignacion;
+        //  }
 
-    public LocalDate getFechaCompletada() {
-        return fechaCompletada;
-    }
+//   public void setFechaAsignacion(LocalDate fechaAsignacion) {
+//      this.fechaAsignacion = fechaAsignacion;
+        //   }
 
-    public void setFechaCompletada(LocalDate fechaCompletada) {
-        this.fechaCompletada = fechaCompletada;
-    }
+//  public LocalDate getFechaCompletada() {
+//       return fechaCompletada;
+        //   }
 
-    public String getEstado() {
-        return estado;
-    }
+//  public void setFechaCompletada(LocalDate fechaCompletada) {
+//       this.fechaCompletada = fechaCompletada;
+        //  }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
-    }
+   // public String getEstado() {        return estado;
+ //   }
 
-    public String getFeedbackUsuario() {
-        return feedbackUsuario;
-    }
+    //    public void setEstado(String estado) {
+        //    this.estado = estado;
+       // }
 
-    public void setFeedbackUsuario(String feedbackUsuario) {
-        this.feedbackUsuario = feedbackUsuario;
-    }
-}
+     //   public String getFeedbackUsuario() {
+        //    return feedbackUsuario;
+        //}/}
+
+    //    public void setFeedbackUsuario(String feedbackUsuario) {
+        //    this.feedbackUsuario = feedbackUsuario;
+        // }
+   // }
