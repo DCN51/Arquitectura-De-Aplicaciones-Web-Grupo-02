@@ -1,4 +1,4 @@
-package pe.edu.upc.arquiwebgrupo02.servicesImplements;
+package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,22 +8,22 @@ import org.springframework.web.server.ResponseStatusException;
 import pe.edu.upc.arquiwebgrupo02.dtos.CreateUserRequestDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.Role;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
-import pe.edu.upc.arquiwebgrupo02.repository.iRoleRepository;
-import pe.edu.upc.arquiwebgrupo02.repository.iUsuarioRepository;
-import pe.edu.upc.arquiwebgrupo02.servicesInterfaces.iUserService;
+import pe.edu.upc.arquiwebgrupo02.repositories.IRoleRepository;
+import pe.edu.upc.arquiwebgrupo02.repositories.IUsuarioRepository;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @Service
-public class UserServiceImplement implements iUserService {
-    private final iUsuarioRepository usuarioRepository;
-    private final iRoleRepository roleRepository;
+public class UserServiceImplement implements pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService {
+    private final IUsuarioRepository usuarioRepository;
+    private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
     public UserServiceImplement(
-            iUsuarioRepository usuarioRepository,
-            iRoleRepository roleRepository,
+            IUsuarioRepository usuarioRepository,
+            IRoleRepository roleRepository,
             PasswordEncoder passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
         this.roleRepository = roleRepository;
@@ -120,5 +120,9 @@ public class UserServiceImplement implements iUserService {
     @Override
     public void delete(Long idUsuario) {
         usuarioRepository.deleteById(idUsuario);
+    }
+    @Override
+    public Optional<Users> listId(Long id) {
+        return usuarioRepository.findById(id);
     }
 }

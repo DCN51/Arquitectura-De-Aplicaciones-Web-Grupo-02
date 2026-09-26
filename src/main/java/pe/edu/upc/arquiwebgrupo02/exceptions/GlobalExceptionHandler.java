@@ -1,12 +1,12 @@
 package pe.edu.upc.arquiwebgrupo02.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
-import pe.edu.upc.arquiwebgrupo02.dtos.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import pe.edu.upc.arquiwebgrupo02.dtos.ErrorResponse;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -48,4 +48,3 @@ public class GlobalExceptionHandler {
                 .body(error);
     }
 }
-
