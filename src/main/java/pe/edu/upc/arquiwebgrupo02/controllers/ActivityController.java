@@ -22,19 +22,19 @@ import pe.edu.upc.arquiwebgrupo02.dtos.ActivityDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.ActividadRecomendada;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.exceptions.ResourceNotFoundException;
-import pe.edu.upc.arquiwebgrupo02.repositories.IActividadRecomendadaRepository;
 import pe.edu.upc.arquiwebgrupo02.repositories.IUsuarioRepository;
+import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IActividadRecomendadaService;
 
 @RestController
 @RequestMapping("/api/activities")
 public class ActivityController {
-    private final IActividadRecomendadaRepository activityRepository;
+    private final IActividadRecomendadaService activityService;
     private final IUsuarioRepository userRepository;
 
     public ActivityController(
-            IActividadRecomendadaRepository activityRepository,
+            IActividadRecomendadaService activityService,
             IUsuarioRepository userRepository) {
-        this.activityRepository = activityRepository;
+        this.activityService = activityService;
         this.userRepository = userRepository;
     }
 
@@ -45,7 +45,8 @@ public class ActivityController {
         apply(request, activity);
         activity.setEstado("PENDING");
         activity.setFechaAsignacion(request.getAssignedDate() == null ? LocalDate.now() : request.getAssignedDate());
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(activityRepository.save(activity)));
+        activityService.insert(activity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(activity));
     }
 
     @GetMapping("/users/{userId}")
@@ -55,8 +56,8 @@ public class ActivityController {
             Authentication authentication) {
         requireOwnerOrPrivileged(authentication, userId);
         List<ActividadRecomendada> activities = status == null || status.isBlank()
-                ? activityRepository.findByUserId(userId)
-                : activityRepository.findByUserIdAndEstadoIgnoreCase(userId, status);
+                ? activityService.listByUserId(userId)
+                : activityService.listByUserIdAndStatus(userId, status);
         return activities.stream().map(this::toDTO).toList();
     }
 
@@ -73,7 +74,8 @@ public class ActivityController {
         activity.setEstado("COMPLETED");
         activity.setFechaCompletada(LocalDate.now());
         activity.setFeedbackUsuario(request.getFeedback());
-        return toDTO(activityRepository.save(activity));
+        activityService.update(activity);
+        return toDTO(activity);
     }
 
     @PutMapping("/{activityId}")
@@ -81,7 +83,8 @@ public class ActivityController {
     public ActivityDTO update(@PathVariable Integer activityId, @Valid @RequestBody ActivityDTO request) {
         ActividadRecomendada activity = findActivity(activityId);
         apply(request, activity);
-        return toDTO(activityRepository.save(activity));
+        activityService.update(activity);
+        return toDTO(activity);
     }
 
     @DeleteMapping("/{activityId}")
@@ -91,7 +94,7 @@ public class ActivityController {
         if (!"PENDING".equalsIgnoreCase(activity.getEstado())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only pending activities can be deleted");
         }
-        activityRepository.delete(activity);
+        activityService.delete(activityId);
         return ResponseEntity.noContent().build();
     }
 
@@ -109,7 +112,7 @@ public class ActivityController {
     }
 
     private ActividadRecomendada findActivity(Integer activityId) {
-        return activityRepository.findById(activityId)
+        return activityService.listId(activityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found: " + activityId));
     }
 

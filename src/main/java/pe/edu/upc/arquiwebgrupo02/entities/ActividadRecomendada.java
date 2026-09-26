@@ -1,16 +1,15 @@
 package pe.edu.upc.arquiwebgrupo02.entities;
 
 import jakarta.persistence.*;
-import org.apache.catalina.User;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "actividadRecomendada")
+@Table(name = "actividadesRecomendadas")
 public class ActividadRecomendada {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "NatividadId")
+    @Column(name = "actividadId")
     private int actividadId;
 
     @ManyToOne(fetch = FetchType.LAZY)
