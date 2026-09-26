@@ -1,16 +1,30 @@
 package pe.edu.upc.arquiwebgrupo02.dtos;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public class CreateUserRequestDTO {
+    @NotBlank @Size(max = 50)
     private String username;
+    @NotNull @Positive
     private Long rolId;
+    @NotBlank @Size(max = 100)
     private String nombres;
+    @NotBlank @Size(max = 100)
     private String apellidos;
+    @NotBlank @Email @Size(max = 150)
     private String correoElectronico;
+    @NotBlank @Size(min = 8, max = 100)
     private String contrasena;
+    @NotBlank @Size(max = 20)
     private String telefono;
+    @NotNull
     private LocalDate fechaNacimiento;
+    @NotBlank @Size(max = 20)
     private String genero;
     private String numeroColegiatura;
     private String especializacion;
