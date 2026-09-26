@@ -6,25 +6,36 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
-public class ActivityDTO {
-    private Integer activityId;
-    @NotNull @Positive
+public class RecommendedActivityDTO {
+    private Integer recommendedActivityId;
+
+    @NotNull
+    @Positive
     private Long userId;
-    @NotNull @Positive
+
+    @NotNull
+    @Positive
     private Integer diagnosisId;
-    @NotBlank @Size(max = 100)
+
+    @NotBlank
+    @Size(max = 100)
     private String title;
-    @NotBlank @Size(max = 255)
+
+    @NotBlank
+    @Size(max = 255)
     private String description;
-    @NotBlank @Size(max = 50)
+
+    @NotBlank
+    @Size(max = 50)
     private String type;
+
     private LocalDate assignedDate;
     private LocalDate completedDate;
     private String status;
     private String feedback;
 
-    public Integer getActivityId() { return activityId; }
-    public void setActivityId(Integer activityId) { this.activityId = activityId; }
+    public Integer getRecommendedActivityId() { return recommendedActivityId; }
+    public void setRecommendedActivityId(Integer recommendedActivityId) { this.recommendedActivityId = recommendedActivityId; }
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
     public Integer getDiagnosisId() { return diagnosisId; }

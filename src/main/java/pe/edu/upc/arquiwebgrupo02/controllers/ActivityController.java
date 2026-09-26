@@ -17,102 +17,100 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import pe.edu.upc.arquiwebgrupo02.dtos.ActivityCompletionDTO;
-import pe.edu.upc.arquiwebgrupo02.dtos.ActivityDTO;
-import pe.edu.upc.arquiwebgrupo02.entities.ActividadRecomendada;
+import pe.edu.upc.arquiwebgrupo02.dtos.RecommendedActivityCompletionDTO;
+import pe.edu.upc.arquiwebgrupo02.dtos.RecommendedActivityDTO;
+import pe.edu.upc.arquiwebgrupo02.entities.RecommendedActivity;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.exceptions.ResourceNotFoundException;
 import pe.edu.upc.arquiwebgrupo02.repositories.IUsuarioRepository;
-import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IActividadRecomendadaService;
+import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IRecommendedActivityService;
 
 @RestController
 @RequestMapping("/api/activities")
 public class ActivityController {
-    private final IActividadRecomendadaService activityService;
+    private final IRecommendedActivityService recommendedActivityService;
     private final IUsuarioRepository userRepository;
 
     public ActivityController(
-            IActividadRecomendadaService activityService,
+            IRecommendedActivityService recommendedActivityService,
             IUsuarioRepository userRepository) {
-        this.activityService = activityService;
+        this.recommendedActivityService = recommendedActivityService;
         this.userRepository = userRepository;
     }
 
     @PostMapping
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'PSICOLOGO', 'ROLE_PSICOLOGO')")
-    public ResponseEntity<ActivityDTO> create(@Valid @RequestBody ActivityDTO request) {
-        ActividadRecomendada activity = new ActividadRecomendada();
-        apply(request, activity);
-        activity.setEstado("PENDING");
-        activity.setFechaAsignacion(request.getAssignedDate() == null ? LocalDate.now() : request.getAssignedDate());
-        activityService.insert(activity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(activity));
+    public ResponseEntity<RecommendedActivityDTO> create(@Valid @RequestBody RecommendedActivityDTO request) {
+        RecommendedActivity recommendedActivity = new RecommendedActivity();
+        apply(request, recommendedActivity);
+        recommendedActivity.setStatus("PENDING");
+        recommendedActivity.setAssignedDate(request.getAssignedDate() == null ? LocalDate.now() : request.getAssignedDate());
+        RecommendedActivity createdActivity = recommendedActivityService.create(recommendedActivity);
+        return ResponseEntity.status(HttpStatus.CREATED).body(toDTO(createdActivity));
     }
 
     @GetMapping("/users/{userId}")
-    public List<ActivityDTO> listForUser(
+    public List<RecommendedActivityDTO> listForUser(
             @PathVariable Long userId,
             @RequestParam(required = false) String status,
             Authentication authentication) {
         requireOwnerOrPrivileged(authentication, userId);
-        List<ActividadRecomendada> activities = status == null || status.isBlank()
-                ? activityService.listByUserId(userId)
-                : activityService.listByUserIdAndStatus(userId, status);
+        List<RecommendedActivity> activities = status == null || status.isBlank()
+                ? recommendedActivityService.findByUserId(userId)
+                : recommendedActivityService.findByUserIdAndStatus(userId, status);
         return activities.stream().map(this::toDTO).toList();
     }
 
     @PutMapping("/{activityId}/complete")
-    public ActivityDTO complete(
+    public RecommendedActivityDTO complete(
             @PathVariable Integer activityId,
-            @Valid @RequestBody ActivityCompletionDTO request,
+            @Valid @RequestBody RecommendedActivityCompletionDTO request,
             Authentication authentication) {
-        ActividadRecomendada activity = findActivity(activityId);
-        requireOwner(authentication, activity.getUsuario());
-        if (!"PENDING".equalsIgnoreCase(activity.getEstado())) {
+        RecommendedActivity recommendedActivity = findActivity(activityId);
+        requireOwner(authentication, recommendedActivity.getUser());
+        if (!"PENDING".equalsIgnoreCase(recommendedActivity.getStatus())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only pending activities can be completed");
         }
-        activity.setEstado("COMPLETED");
-        activity.setFechaCompletada(LocalDate.now());
-        activity.setFeedbackUsuario(request.getFeedback());
-        activityService.update(activity);
-        return toDTO(activity);
+        recommendedActivity.setStatus("COMPLETED");
+        recommendedActivity.setCompletedDate(LocalDate.now());
+        recommendedActivity.setFeedback(request.getFeedback());
+        return toDTO(recommendedActivityService.update(recommendedActivity));
     }
 
     @PutMapping("/{activityId}")
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'PSICOLOGO', 'ROLE_PSICOLOGO')")
-    public ActivityDTO update(@PathVariable Integer activityId, @Valid @RequestBody ActivityDTO request) {
-        ActividadRecomendada activity = findActivity(activityId);
-        apply(request, activity);
-        activityService.update(activity);
-        return toDTO(activity);
+    public RecommendedActivityDTO update(@PathVariable Integer activityId, @Valid @RequestBody RecommendedActivityDTO request) {
+        RecommendedActivity recommendedActivity = findActivity(activityId);
+        apply(request, recommendedActivity);
+        return toDTO(recommendedActivityService.update(recommendedActivity));
     }
 
     @DeleteMapping("/{activityId}")
     @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR', 'PSICOLOGO', 'ROLE_PSICOLOGO')")
     public ResponseEntity<Void> delete(@PathVariable Integer activityId) {
-        ActividadRecomendada activity = findActivity(activityId);
-        if (!"PENDING".equalsIgnoreCase(activity.getEstado())) {
+        RecommendedActivity recommendedActivity = findActivity(activityId);
+        if (!"PENDING".equalsIgnoreCase(recommendedActivity.getStatus())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only pending activities can be deleted");
         }
-        activityService.delete(activityId);
+        recommendedActivityService.deleteById(activityId);
         return ResponseEntity.noContent().build();
     }
 
-    private void apply(ActivityDTO request, ActividadRecomendada activity) {
+    private void apply(RecommendedActivityDTO request, RecommendedActivity recommendedActivity) {
         Users user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + request.getUserId()));
-        activity.setUsuario(user);
-        activity.setDiagnosticoId(request.getDiagnosisId());
-        activity.setTitulo(request.getTitle().trim());
-        activity.setDescripcion(request.getDescription().trim());
-        activity.setTipo(request.getType().trim());
+        recommendedActivity.setUser(user);
+        recommendedActivity.setDiagnosisId(request.getDiagnosisId());
+        recommendedActivity.setTitle(request.getTitle().trim());
+        recommendedActivity.setDescription(request.getDescription().trim());
+        recommendedActivity.setType(request.getType().trim());
         if (request.getAssignedDate() != null) {
-            activity.setFechaAsignacion(request.getAssignedDate());
+            recommendedActivity.setAssignedDate(request.getAssignedDate());
         }
     }
 
-    private ActividadRecomendada findActivity(Integer activityId) {
-        return activityService.listId(activityId)
+    private RecommendedActivity findActivity(Integer activityId) {
+        return recommendedActivityService.findById(activityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Activity not found: " + activityId));
     }
 
@@ -138,18 +136,18 @@ public class ActivityController {
                         || role.equals("PSICOLOGO") || role.equals("ROLE_PSICOLOGO"));
     }
 
-    private ActivityDTO toDTO(ActividadRecomendada activity) {
-        ActivityDTO response = new ActivityDTO();
-        response.setActivityId(activity.getActividadId());
-        response.setUserId(activity.getUsuario().getId());
-        response.setDiagnosisId(activity.getDiagnosticoId());
-        response.setTitle(activity.getTitulo());
-        response.setDescription(activity.getDescripcion());
-        response.setType(activity.getTipo());
-        response.setAssignedDate(activity.getFechaAsignacion());
-        response.setCompletedDate(activity.getFechaCompletada());
-        response.setStatus(activity.getEstado());
-        response.setFeedback(activity.getFeedbackUsuario());
+    private RecommendedActivityDTO toDTO(RecommendedActivity recommendedActivity) {
+        RecommendedActivityDTO response = new RecommendedActivityDTO();
+        response.setRecommendedActivityId(recommendedActivity.getRecommendedActivityId());
+        response.setUserId(recommendedActivity.getUser().getId());
+        response.setDiagnosisId(recommendedActivity.getDiagnosisId());
+        response.setTitle(recommendedActivity.getTitle());
+        response.setDescription(recommendedActivity.getDescription());
+        response.setType(recommendedActivity.getType());
+        response.setAssignedDate(recommendedActivity.getAssignedDate());
+        response.setCompletedDate(recommendedActivity.getCompletedDate());
+        response.setStatus(recommendedActivity.getStatus());
+        response.setFeedback(recommendedActivity.getFeedback());
         return response;
     }
 }
