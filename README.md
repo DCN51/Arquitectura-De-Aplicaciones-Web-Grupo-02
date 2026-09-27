@@ -1,10 +1,5 @@
-##     ## #### ##    ## ########     ##     ## ########    ###    ##       ######## ##     ##
-###   ###  ##  ###   ## ##     ##    ##     ## ##         ## ##   ##          ##    ##     ##
-#### ####  ##  ####  ## ##     ##    ##     ## ##        ##   ##  ##          ##    ##     ##
-## ### ##  ##  ## ## ## ##     ##    ######### ######   ##     ## ##          ##    #########
-##     ##  ##  ##  #### ##     ##    ##     ## ##       ######### ##          ##    ##     ##
-##     ##  ##  ##   ### ##     ##    ##     ## ##       ##     ## ##          ##    ##     ##
-##     ## #### ##    ## ########     ##     ## ######## ##     ## ########    ##    ##     ##
+<img width="1125" height="160" alt="ascii-art-text" src="https://github.com/user-attachments/assets/c840e7a5-e853-4c72-815f-5c0ac6177b0f" />
+
 # Arquitectura-De-Aplicaciones-Web-Grupo-02
 
 #MindHealth - Plataforma de Apoyo a la Salud Mental MindHealth es una aplicación de chat digital diseñada para mejorar el bienestar emocional de los usuarios a través de herramientas de seguimiento, conexión con profesionales de salud mental, y recursos personalizados.
