@@ -1,23 +1,27 @@
+█   █ ███ █   █ ████     █   █ █████  ███  █     █████ █   █ 
+██ ██  █  ██  █ █   █    █   █ █     █   █ █       █   █   █ 
+█ █ █  █  █ █ █ █   █    █████ ████  █████ █       █   █████ 
+█   █  █  █  ██ █   █    █   █ █     █   █ █       █   █   █ 
+█   █ ███ █   █ ████     █   █ █████ █   █ █████   █   █   █ 
+
 # Arquitectura-De-Aplicaciones-Web-Grupo-02
+
 #MindHealth - Plataforma de Apoyo a la Salud Mental MindHealth es una aplicación de chat digital diseñada para mejorar el bienestar emocional de los usuarios a través de herramientas de seguimiento, conexión con profesionales de salud mental, y recursos personalizados.
 
-##Características principales
+##Funcionalidades ofrecidas
 
-Registro y gestión de sesiones psicológicas.
+Registro y gestión de las sesiones psicológicas con el chatbot.
 
-Evaluaciones emocionales periódicas.
+Recomendaciones de actividades personalizadas en base a las sesiones.
 
-Recomendaciones personalizadas y seguimiento del estado de ánimo.
+Sistema de notificaciones de alertas y derivación a especialistas.
 
-Acceso a recursos terapéuticos.
+Servicio gratuito básico, suscripción y planes de pago.
 
-Comunidad y foros de apoyo emocional.
-
-Sistema de notificaciones preventivas y alertas para psicólogos. ##Público objetivo
-
+##Público objetivo
 Personas en búsqueda de apoyo emocional.
 
-Psicólogos y terapeutas.
+Psicólogos y terapeutas interesados.
 
 Clínicas y centros de salud mental.
 
