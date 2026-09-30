@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.arquiwebgrupo02.dtos.SuscripcionDTO;
+import pe.edu.upc.arquiwebgrupo02.dtos.SuscriptoresPorPlanDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.CatalogoPlan;
 import pe.edu.upc.arquiwebgrupo02.entities.Suscripcion;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
@@ -90,6 +91,31 @@ public class SuscripcionController {
         List<SuscripcionDTO> lista = sS.historialPorUsuario(usuarioId)
                 .stream()
                 .map(s -> modelMapper.map(s, SuscripcionDTO.class))
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
+
+    // US09 - Consultar suscripciones por vencer (@Query)
+    @GetMapping("/por-vencer")
+    public ResponseEntity<List<SuscripcionDTO>> porVencer(@RequestParam(defaultValue = "7") int dias) {
+        List<SuscripcionDTO> lista = sS.porVencer(dias)
+                .stream()
+                .map(s -> modelMapper.map(s, SuscripcionDTO.class))
+                .toList();
+        return ResponseEntity.ok(lista);
+    }
+
+    // US10 - Contar suscriptores activos por plan (@Query)
+    @GetMapping("/suscriptores-por-plan")
+    public ResponseEntity<List<SuscriptoresPorPlanDTO>> suscriptoresPorPlan() {
+        List<SuscriptoresPorPlanDTO> lista = sS.contarSuscriptoresActivosPorPlan()
+                .stream()
+                .map(item -> {
+                    SuscriptoresPorPlanDTO dto = new SuscriptoresPorPlanDTO();
+                    dto.setNombrePlan((String) item[0]);
+                    dto.setCantidadSuscriptores(((Number) item[1]).longValue());
+                    return dto;
+                })
                 .toList();
         return ResponseEntity.ok(lista);
     }

@@ -77,6 +77,22 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
         return sR.buscarHistorialPorUsuario(usuarioId);
     }
 
+    // US09 - Consultar suscripciones por vencer
+    @Override
+    public List<Suscripcion> porVencer(int dias) {
+        if (dias < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El número de días no puede ser negativo");
+        }
+        LocalDate hoy = LocalDate.now();
+        return sR.buscarPorVencer(hoy, hoy.plusDays(dias));
+    }
+
+    // US10 - Contar suscriptores activos por plan
+    @Override
+    public List<Object[]> contarSuscriptoresActivosPorPlan() {
+        return sR.contarSuscriptoresActivosPorPlan();
+    }
+
     // Completa los datos de una suscripcion nueva y la guarda (lo usan US05 y US06)
     private void guardarNueva(Suscripcion s) {
         // 1. Buscar el plan elegido y verificar que se pueda contratar

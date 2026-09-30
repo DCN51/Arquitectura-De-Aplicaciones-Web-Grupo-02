@@ -12,5 +12,7 @@ public interface ISuscripcionService {
     public void cambiarPlan(Suscripcion s);                         // US06 - Cambiar plan
     public void cancelar(Long usuarioId);                   // US07 - Cancelar suscripcion
     public List<Suscripcion> historialPorUsuario(Long usuarioId);
+    public List<Suscripcion> porVencer(int dias);                   // US09 - Suscripciones por vencer
+    public List<Object[]> contarSuscriptoresActivosPorPlan();       // US10 - Suscriptores por plan
 
 }
