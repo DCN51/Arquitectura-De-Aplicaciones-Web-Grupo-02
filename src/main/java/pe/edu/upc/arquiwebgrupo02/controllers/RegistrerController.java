@@ -1,5 +1,6 @@
 package pe.edu.upc.arquiwebgrupo02.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class RegistrerController {
 
     @PostMapping("/registro")
     public ResponseEntity<CreateUserResponseDTO> registrar(
-            @RequestBody CreateUserRequestDTO registro) {
+            @Valid @RequestBody CreateUserRequestDTO registro) {
         Users user = usuarioService.registrar(registro);
         return ResponseEntity.status(HttpStatus.CREATED).body(
                 new CreateUserResponseDTO(
