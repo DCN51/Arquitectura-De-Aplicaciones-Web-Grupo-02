@@ -3,8 +3,10 @@ package pe.edu.upc.arquiwebgrupo02.entities;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+
+@Entity
 @Table(name = "recommendedActivities")
-public class RecomendedActivity {
+public class RecommendedActivity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "recommendedActivityId")
@@ -42,10 +44,10 @@ public class RecomendedActivity {
         return recommendedActivityId;
     }
 
-    public RecomendedActivity() {
+    public RecommendedActivity() {
     }
 
-    public RecomendedActivity(Integer recommendedActivityId, Users user, Integer diagnosisId, String title, String description, String type, LocalDate assignedDate, LocalDate completedDate, String status, String feedback) {
+    public RecommendedActivity(Integer recommendedActivityId, Users user, Integer diagnosisId, String title, String description, String type, LocalDate assignedDate, LocalDate completedDate, String status, String feedback) {
         this.recommendedActivityId = recommendedActivityId;
         this.user = user;
         this.diagnosisId = diagnosisId;
