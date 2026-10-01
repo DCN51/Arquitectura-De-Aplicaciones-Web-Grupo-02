@@ -1,5 +1,6 @@
 package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -21,13 +22,8 @@ public class RecommendedActivityServiceImplement implements IRecommendedActivity
     }
 
     @Override
-    public List<RecommendedActivity> findByUserId(Long userId) {
-        return recommendedActivityRepository.findByUserId(userId);
-    }
-
-    @Override
-    public List<RecommendedActivity> findByUserIdAndStatus(Long userId, String status) {
-        return recommendedActivityRepository.findByUserIdAndStatusIgnoreCase(userId, status);
+    public List<RecommendedActivity> buscarPorPaciente(Long userId, String status, LocalDate from, LocalDate to) {
+        return recommendedActivityRepository.buscarPorPaciente(userId, status, from, to);
     }
 
     @Override

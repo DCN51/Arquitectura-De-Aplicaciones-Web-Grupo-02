@@ -88,6 +88,7 @@ public class UserServiceImplement implements pe.edu.upc.arquiwebgrupo02.services
         user.setTelefono(registro.getTelefono().trim());
         user.setFechaNacimiento(registro.getFechaNacimiento());
         user.setGenero(registro.getGenero().trim());
+        user.setEstadoCuenta("ACTIVO");
         user.setNumeroColegiatura(emptyToNull(registro.getNumeroColegiatura()));
         user.setEspecializacion(emptyToNull(registro.getEspecializacion()));
         user.setAnosExperiencia(registro.getAnosExperiencia());

@@ -10,22 +10,22 @@ import java.util.List;
 public interface IDiagnosticoClinicoRepository extends JpaRepository<DiagnosticoClinico, Long> {
 
     @Query(value = "select * from diagnosticos_clinicos " +
-            "where usuario_id = :usuarioId " +
-            "order by fecha_diagnostico desc", nativeQuery = true)
+            " where usuario_id = :usuarioId" +
+            " order by fecha_diagnostico desc", nativeQuery = true)
     public List<DiagnosticoClinico> buscarHistorialPorUsuario(@Param("usuarioId") Long usuarioId);
 
     @Query(value = "select * from diagnosticos_clinicos " +
-            "where validacion_psicologo_id is null " +
-            "order by fecha_diagnostico asc", nativeQuery = true)
+            " where validacion_psicologo_id is null" +
+            " order by fecha_diagnostico asc", nativeQuery = true)
     public List<DiagnosticoClinico> buscarPendientesDeValidar();
 
     @Query(value = "select * from diagnosticos_clinicos " +
-            "where sesion_clinica_id = :sesionClinicaId " +
-            "limit 1", nativeQuery = true)
+            " where sesion_clinica_id = :sesionClinicaId" +
+            " limit 1", nativeQuery = true)
     public DiagnosticoClinico buscarPorSesion(@Param("sesionClinicaId") Long sesionClinicaId);
 
     @Query(value = "select * from diagnosticos_clinicos " +
-            "where validacion_psicologo_id = :psicologoId " +
-            "order by fecha_validacion desc", nativeQuery = true)
+            " where validacion_psicologo_id = :psicologoId" +
+            " order by fecha_validacion desc", nativeQuery = true)
     public List<DiagnosticoClinico> buscarValidadosPorPsicologo(@Param("psicologoId") Long psicologoId);
 }

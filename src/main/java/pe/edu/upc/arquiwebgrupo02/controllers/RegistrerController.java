@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pe.edu.upc.arquiwebgrupo02.dtos.CreateUserRequestDTO;
-import pe.edu.upc.arquiwebgrupo02.dtos.CreateUserResponseDTO;
+import pe.edu.upc.arquiwebgrupo02.dtos.UserResponseDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 
 @RestController
-@RequestMapping("/usuarios")
+@RequestMapping({"/usuarios", "/api/usuarios"})
 public class RegistrerController {
     private final pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService usuarioService;
 
@@ -21,15 +21,21 @@ public class RegistrerController {
     }
 
     @PostMapping("/registro")
-    public ResponseEntity<CreateUserResponseDTO> registrar(
+    public ResponseEntity<UserResponseDTO> registrar(
             @Valid @RequestBody CreateUserRequestDTO registro) {
         Users user = usuarioService.registrar(registro);
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                new CreateUserResponseDTO(
-                        user.getId(),
-                        user.getUsername(),
-                        user.getRole().getRol()
-                )
-        );
+        UserResponseDTO response = new UserResponseDTO();
+        response.setUserId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setRoleId(user.getRole().getId());
+        response.setRoleName(user.getRole().getRol());
+        response.setFirstName(user.getNombres());
+        response.setLastName(user.getApellidos());
+        response.setEmail(user.getCorreoElectronico());
+        response.setPhone(user.getTelefono());
+        response.setBirthDate(user.getFechaNacimiento());
+        response.setGender(user.getGenero());
+        response.setAccountStatus(user.getEstadoCuenta());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

@@ -15,7 +15,7 @@ public class RecommendedActivityDTO {
 
     @NotNull
     @Positive
-    private Integer diagnosisId;
+    private Long diagnosisId;
 
     @NotBlank
     @Size(max = 100)
@@ -38,8 +38,8 @@ public class RecommendedActivityDTO {
     public void setRecommendedActivityId(Integer recommendedActivityId) { this.recommendedActivityId = recommendedActivityId; }
     public Long getUserId() { return userId; }
     public void setUserId(Long userId) { this.userId = userId; }
-    public Integer getDiagnosisId() { return diagnosisId; }
-    public void setDiagnosisId(Integer diagnosisId) { this.diagnosisId = diagnosisId; }
+    public Long getDiagnosisId() { return diagnosisId; }
+    public void setDiagnosisId(Long diagnosisId) { this.diagnosisId = diagnosisId; }
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
     public String getDescription() { return description; }

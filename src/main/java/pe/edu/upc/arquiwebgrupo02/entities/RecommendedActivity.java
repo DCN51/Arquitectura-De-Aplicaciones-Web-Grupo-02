@@ -16,8 +16,9 @@ public class RecommendedActivity {
     @JoinColumn(name = "userId", nullable = false)
     private Users user;
 
-    @Column(name = "diagnosisId", nullable = false)
-    private Integer diagnosisId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "diagnosisId", nullable = false)
+    private DiagnosticoClinico diagnosticoClinico;
 
     @Column(name = "title", length = 100, nullable = false)
     private String title;
@@ -47,10 +48,10 @@ public class RecommendedActivity {
     public RecommendedActivity() {
     }
 
-    public RecommendedActivity(Integer recommendedActivityId, Users user, Integer diagnosisId, String title, String description, String type, LocalDate assignedDate, LocalDate completedDate, String status, String feedback) {
+    public RecommendedActivity(Integer recommendedActivityId, Users user, DiagnosticoClinico diagnosticoClinico, String title, String description, String type, LocalDate assignedDate, LocalDate completedDate, String status, String feedback) {
         this.recommendedActivityId = recommendedActivityId;
         this.user = user;
-        this.diagnosisId = diagnosisId;
+        this.diagnosticoClinico = diagnosticoClinico;
         this.title = title;
         this.description = description;
         this.type = type;
@@ -72,12 +73,12 @@ public class RecommendedActivity {
         this.user = user;
     }
 
-    public Integer getDiagnosisId() {
-        return diagnosisId;
+    public DiagnosticoClinico getDiagnosticoClinico() {
+        return diagnosticoClinico;
     }
 
-    public void setDiagnosisId(Integer diagnosisId) {
-        this.diagnosisId = diagnosisId;
+    public void setDiagnosticoClinico(DiagnosticoClinico diagnosticoClinico) {
+        this.diagnosticoClinico = diagnosticoClinico;
     }
 
     public String getTitle() {
@@ -136,4 +137,3 @@ public class RecommendedActivity {
         this.feedback = feedback;
     }
 }
-

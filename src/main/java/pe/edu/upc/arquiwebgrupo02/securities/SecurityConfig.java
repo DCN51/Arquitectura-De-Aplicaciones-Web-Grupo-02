@@ -70,6 +70,7 @@ public class SecurityConfig {
                         // Login público
                         .requestMatchers("/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios/registro").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/usuarios/registro").permitAll()
 
                         // El chat está disponible para pacientes y psicólogos autenticados
                         .requestMatchers("/chat/**").hasAnyAuthority(

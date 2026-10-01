@@ -36,15 +36,10 @@ public class UserController {
     @GetMapping
     public List<UserResponseDTO> list(
             @RequestParam(required = false) Long roleId,
-            @RequestParam(required = false) String accountStatus,
+            @RequestParam(required = false) String estadoCuenta,
             Authentication authentication) {
         requireAdministrator(authentication);
-        List<Users> users = roleId != null ? userRepository.findByRoleId(roleId)
-                : accountStatus != null ? userRepository.findByEstadoCuentaIgnoreCase(accountStatus)
-                : userRepository.findAll();
-        if (roleId != null && accountStatus != null) {
-            users = users.stream().filter(user -> accountStatus.equalsIgnoreCase(user.getEstadoCuenta())).toList();
-        }
+        List<Users> users = userRepository.buscarPorRolYEstado(roleId, hasText(estadoCuenta) ? estadoCuenta.trim() : null);
         return users.stream().map(this::toDTO).toList();
     }
 
@@ -61,7 +56,7 @@ public class UserController {
             @Valid @RequestBody UserUpdateRequestDTO request,
             Authentication authentication) {
         Users user = findUser(userId);
-        requireOwnerOrAdministrator(authentication, user);
+        requireOwner(authentication, user);
         updateIfPresent(request, user);
         return toDTO(userRepository.save(user));
     }
@@ -70,6 +65,9 @@ public class UserController {
     public UserResponseDTO deactivate(@PathVariable Long userId, Authentication authentication) {
         requireAdministrator(authentication);
         Users user = findUser(userId);
+        if (!user.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "User account is already inactive");
+        }
         user.setEstadoCuenta("INACTIVO");
         return toDTO(userRepository.save(user));
     }
@@ -79,7 +77,7 @@ public class UserController {
         if (hasText(request.getLastName())) user.setApellidos(request.getLastName().trim());
         if (hasText(request.getEmail())) {
             String email = request.getEmail().trim().toLowerCase(Locale.ROOT);
-            if (!email.equalsIgnoreCase(user.getCorreoElectronico()) && userRepository.existsByCorreoElectronico(email)) {
+            if (userRepository.existsByCorreoElectronicoAndIdNot(email, user.getId())) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Email is already registered");
             }
             user.setCorreoElectronico(email);
@@ -102,6 +100,12 @@ public class UserController {
     private void requireOwnerOrAdministrator(Authentication authentication, Users user) {
         if (!user.getUsername().equals(authentication.getName()) && !isAdministrator(authentication)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to access this user");
+        }
+    }
+
+    private void requireOwner(Authentication authentication, Users user) {
+        if (authentication == null || !user.getUsername().equals(authentication.getName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to update this user");
         }
     }
 
