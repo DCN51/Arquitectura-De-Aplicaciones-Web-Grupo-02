@@ -12,7 +12,7 @@ import pe.edu.upc.arquiwebgrupo02.dtos.UserResponseDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 
 @RestController
-@RequestMapping({"/usuarios", "/api/usuarios"})
+@RequestMapping("/api/usuarios")
 public class RegistrerController {
     private final pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService usuarioService;
 
@@ -20,7 +20,7 @@ public class RegistrerController {
         this.usuarioService = usuarioService;
     }
 
-    @PostMapping("/registro")
+    @PostMapping()
     public ResponseEntity<UserResponseDTO> registrar(
             @Valid @RequestBody CreateUserRequestDTO registro) {
         Users user = usuarioService.registrar(registro);

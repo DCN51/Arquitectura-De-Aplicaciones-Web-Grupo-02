@@ -32,26 +32,6 @@ public class RoleController {
         return roleService.list().stream().map(this::toDTO).toList();
     }
 
-    @PostMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
-    public ResponseEntity<RoleDTO> create(@Valid @RequestBody RoleDTO request) {
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(toDTO(roleService.create(request.getName().trim())));
-    }
-
-    @PutMapping("/{roleId}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
-    public RoleDTO update(@PathVariable Long roleId, @Valid @RequestBody RoleDTO request) {
-        return toDTO(roleService.update(roleId, request.getName().trim()));
-    }
-
-    @DeleteMapping("/{roleId}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
-    public ResponseEntity<Void> delete(@PathVariable Long roleId) {
-        roleService.delete(roleId);
-        return ResponseEntity.noContent().build();
-    }
-
     private RoleDTO toDTO(Role role) {
         RoleDTO response = new RoleDTO();
         response.setRoleId(role.getId());

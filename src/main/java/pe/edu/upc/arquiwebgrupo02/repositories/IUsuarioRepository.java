@@ -15,9 +15,10 @@ public interface IUsuarioRepository extends JpaRepository<Users, Long> {
     boolean existsByRoleId(Long roleId);
     boolean existsByCorreoElectronicoAndIdNot(String correoElectronico, Long id);
 
-    @Query("select u from Users u " +
-            "where (:roleId is null or u.role.id = :roleId) " +
-            "and (:estadoCuenta is null or upper(u.estadoCuenta) = upper(:estadoCuenta))")
+    // HU-04: usuarios por rol y estado de cuenta (ambos filtros opcionales)
+    @Query(value = "select * from users u\n" +
+            " where (cast(:roleId as bigint) is null or u.idrol = cast(:roleId as bigint))\n" +
+            " and (cast(:estadoCuenta as varchar) is null or upper(u.account_status) = upper(cast(:estadoCuenta as varchar)))", nativeQuery = true)
     List<Users> buscarPorRolYEstado(
             @Param("roleId") Long roleId,
             @Param("estadoCuenta") String estadoCuenta);
