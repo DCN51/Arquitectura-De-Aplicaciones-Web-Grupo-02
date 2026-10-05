@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -42,17 +43,21 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
-    public UserResponseDTO get(@PathVariable Long userId) {
-        return toDTO(findUser(userId));
+    @PreAuthorize("isAuthenticated()")
+    public UserResponseDTO get(@PathVariable Long userId, Authentication authentication) {
+        Users user = findUser(userId);
+        requireOwnerOrAdministrator(authentication, user);
+        return toDTO(user);
     }
 
     @PutMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
+    @PreAuthorize("isAuthenticated()")
     public UserResponseDTO update(
             @PathVariable Long userId,
-            @Valid @RequestBody UserUpdateRequestDTO request) {
+            @Valid @RequestBody UserUpdateRequestDTO request,
+            Authentication authentication) {
         Users user = findUser(userId);
+        requireOwnerOrAdministrator(authentication, user);
         updateIfPresent(request, user);
         return toDTO(userRepository.save(user));
     }
@@ -91,6 +96,16 @@ public class UserController {
     private Users findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
+    }
+
+    private void requireOwnerOrAdministrator(Authentication authentication, Users user) {
+        boolean isOwner = user.getUsername().equals(authentication.getName());
+        boolean isAdministrator = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ADMINISTRADOR")
+                        || authority.getAuthority().equals("ROLE_ADMINISTRADOR"));
+        if (!isOwner && !isAdministrator) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to access this user");
+        }
     }
 
     private UserResponseDTO toDTO(Users user) {
