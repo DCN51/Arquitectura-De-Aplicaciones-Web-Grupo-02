@@ -5,6 +5,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +48,7 @@ public class ActivityController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO')")
     public ResponseEntity<RecommendedActivityDTO> create(@Valid @RequestBody RecommendedActivityDTO request) {
         RecommendedActivity recommendedActivity = new RecommendedActivity();
         apply(request, recommendedActivity);
@@ -58,11 +61,13 @@ public class ActivityController {
     }
 
     @GetMapping("/users/{userId}")
+    @PreAuthorize("hasAnyAuthority('PACIENTE', 'ROLE_PACIENTE')")
     public List<RecommendedActivityDTO> listForUser(
             @PathVariable Long userId,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) LocalDate from,
-            @RequestParam(required = false) LocalDate to) {
+            @RequestParam(required = false) LocalDate to,
+            Authentication authentication) {
         if (from != null && to != null && from.isAfter(to)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La fecha desde no puede ser mayor que la fecha hasta");
         }
@@ -71,6 +76,7 @@ public class ActivityController {
         if (!isPaciente(user)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solo un paciente puede consultar sus actividades");
         }
+        requireOwner(authentication, user);
 
         String estado = status == null || status.isBlank() ? null : status.trim();
         List<RecommendedActivity> activities = recommendedActivityService.buscarPorPaciente(userId, estado, from, to);
@@ -78,10 +84,13 @@ public class ActivityController {
     }
 
     @PutMapping("/{activityId}/complete")
+    @PreAuthorize("hasAnyAuthority('PACIENTE', 'ROLE_PACIENTE')")
     public RecommendedActivityDTO complete(
             @PathVariable Integer activityId,
-            @Valid @RequestBody RecommendedActivityCompletionDTO request) {
+            @Valid @RequestBody RecommendedActivityCompletionDTO request,
+            Authentication authentication) {
         RecommendedActivity recommendedActivity = findActivity(activityId);
+        requireOwner(authentication, recommendedActivity.getUser());
         if (!isPendiente(recommendedActivity.getStatus())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only pending activities can be completed");
         }
@@ -92,6 +101,7 @@ public class ActivityController {
     }
 
     @PutMapping("/{activityId}")
+    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO')")
     public RecommendedActivityDTO update(@PathVariable Integer activityId, @Valid @RequestBody RecommendedActivityDTO request) {
         RecommendedActivity recommendedActivity = findActivity(activityId);
         String estado = recommendedActivity.getStatus();
@@ -105,6 +115,7 @@ public class ActivityController {
     }
 
     @DeleteMapping("/{activityId}")
+    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO')")
     public ResponseEntity<Void> delete(@PathVariable Integer activityId) {
         RecommendedActivity recommendedActivity = findActivity(activityId);
         if (!isPendiente(recommendedActivity.getStatus())) {
@@ -143,6 +154,12 @@ public class ActivityController {
     private boolean isPaciente(Users user) {
         String rol = user.getRole().getRol().toUpperCase(Locale.ROOT);
         return rol.equals("PACIENTE") || rol.equals("ROLE_PACIENTE");
+    }
+
+    private void requireOwner(Authentication authentication, Users user) {
+        if (authentication == null || !user.getUsername().equals(authentication.getName())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to access this activity");
+        }
     }
 
     private boolean isPendiente(String estado) {

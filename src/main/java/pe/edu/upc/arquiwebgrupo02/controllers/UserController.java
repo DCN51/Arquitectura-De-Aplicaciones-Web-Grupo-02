@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -31,8 +32,8 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Por ahora sin control de roles (luego: solo administrador)
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
     public List<UserResponseDTO> list(
             @RequestParam(required = false) Long roleId,
             @RequestParam(required = false) String estadoCuenta) {
@@ -40,14 +41,14 @@ public class UserController {
         return users.stream().map(this::toDTO).toList();
     }
 
-    // Por ahora sin control de roles (luego: administrador o dueño)
     @GetMapping("/{userId}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
     public UserResponseDTO get(@PathVariable Long userId) {
         return toDTO(findUser(userId));
     }
 
-    // Por ahora sin control de roles (luego: solo el dueño)
     @PutMapping("/{userId}")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
     public UserResponseDTO update(
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequestDTO request) {
@@ -56,8 +57,8 @@ public class UserController {
         return toDTO(userRepository.save(user));
     }
 
-    // Por ahora sin control de roles (luego: solo administrador)
     @PatchMapping("/{userId}/deactivate")
+    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
     public UserResponseDTO deactivate(@PathVariable Long userId) {
         Users user = findUser(userId);
         if (!user.isEnabled()) {
