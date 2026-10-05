@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public List<UserResponseDTO> list(
             @RequestParam(required = false) Long roleId,
             @RequestParam(required = false) String estadoCuenta) {
@@ -42,13 +42,13 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public UserResponseDTO get(@PathVariable Long userId) {
         return toDTO(findUser(userId));
     }
 
     @PutMapping("/{userId}")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('PACIENTE','PSICOLOGO','ADMINISTRADOR')")
     public UserResponseDTO update(
             @PathVariable Long userId,
             @Valid @RequestBody UserUpdateRequestDTO request) {
@@ -58,7 +58,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}/deactivate")
-    @PreAuthorize("hasAnyAuthority('ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public UserResponseDTO deactivate(@PathVariable Long userId) {
         Users user = findUser(userId);
         if (!user.isEnabled()) {
