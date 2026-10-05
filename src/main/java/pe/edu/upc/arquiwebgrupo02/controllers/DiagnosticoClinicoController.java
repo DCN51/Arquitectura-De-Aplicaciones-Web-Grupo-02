@@ -55,7 +55,7 @@ public class DiagnosticoClinicoController {
     }
 
     @PutMapping("/{id}/validar")
-    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO')")
+    
     public ResponseEntity<DiagnosticoClinicoDTO> validar(@PathVariable Long id, Authentication authentication) {
         Users psicologo = uR.findByUsername(authentication.getName())
                 .orElseThrow(() ->
@@ -93,7 +93,7 @@ public class DiagnosticoClinicoController {
     }
 
     @GetMapping("/pendientes")
-    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
+
     public ResponseEntity<List<DiagnosticoClinicoDTO>> pendientes() {
         List<DiagnosticoClinicoDTO> lista = dcS.listarPendientesDeValidar()
                 .stream()
@@ -103,7 +103,7 @@ public class DiagnosticoClinicoController {
     }
 
     @GetMapping("/psicologo/{psicologoId}")
-    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
+
     public ResponseEntity<List<DiagnosticoClinicoDTO>> validadosPorPsicologo(@PathVariable Long psicologoId) {
         List<DiagnosticoClinicoDTO> lista = dcS.listarValidadosPorPsicologo(psicologoId)
                 .stream()

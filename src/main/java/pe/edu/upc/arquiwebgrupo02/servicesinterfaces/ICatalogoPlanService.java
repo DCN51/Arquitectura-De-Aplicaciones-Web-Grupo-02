@@ -10,7 +10,6 @@ public interface ICatalogoPlanService {
     public void insert (CatalogoPlan c);
     public List<CatalogoPlan> list ();
     public void update (CatalogoPlan c);
-    public void delete (Long catalogoPlanId);
     public Optional<CatalogoPlan> listId(Long id);
 
 }

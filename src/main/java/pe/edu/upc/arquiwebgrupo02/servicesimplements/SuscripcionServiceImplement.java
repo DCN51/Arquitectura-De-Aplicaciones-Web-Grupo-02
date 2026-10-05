@@ -1,11 +1,12 @@
 package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 
+import jakarta.transaction.Transactional;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pe.edu.upc.arquiwebgrupo02.entities.CatalogoPlan;
-import jakarta.transaction.Transactional;
-import org.springframework.stereotype.Service;
 import pe.edu.upc.arquiwebgrupo02.entities.Suscripcion;
+import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.repositories.ICatalogoPlanRepository;
 import pe.edu.upc.arquiwebgrupo02.repositories.ISuscripcionRepository;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.ISuscripcionService;
@@ -23,20 +24,26 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
         this.cpR = cpR;
     }
 
-
-    // US05 - Contratar plan
+    // HU015 - Contratar plan
     @Override
+    @Transactional
     public void insert(Suscripcion s) {
-        // Si ya tiene una activa, no puede contratar otra
-        if (sR.buscarActivaPorUsuario(s.getUsuario().getId()) != null) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya tienes una suscripción activa");
+        Suscripcion actual = sR.buscarActivaPorUsuario(s.getUsuario().getId());
+
+        if (actual != null) {
+            // Si ya paga un plan, no puede contratar otro (para eso es cambiar plan)
+            if (actual.getCatalogoPlan().getPrecioMensualCatalogoPlan() > 0) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya tienes una suscripción activa");
+            }
+            // Si tiene el free y elige el free otra vez, no tiene sentido
+            if (actual.getCatalogoPlan().getCatalogoPlanId().equals(s.getCatalogoPlan().getCatalogoPlanId())) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ya estás suscrito a este plan");
+            }
+            // Si tiene el free, se cancela y se contrata el nuevo
+            actual.setEstadoSuscripcion("cancelada");
+            sR.save(actual);
         }
         guardarNueva(s);
-    }
-
-    @Override
-    public List<Suscripcion> list() {
-        return sR.findAll();
     }
 
     // US06 - Cambiar plan
@@ -93,7 +100,37 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
         return sR.contarSuscriptoresActivosPorPlan();
     }
 
-    // Completa los datos de una suscripcion nueva y la guarda (lo usan US05 y US06)
+    // NUEVO - Asigna el plan free a un paciente recien registrado
+    @Override
+    public void asignarPlanFree(Users usuario) {
+        CatalogoPlan free = cpR.buscarPlanFree();
+        if (free == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "No existe un plan 'free' activo en el catálogo");
+        }
+        Suscripcion s = new Suscripcion();
+        s.setUsuario(usuario);
+        s.setCatalogoPlan(free);
+        guardarNueva(s);
+    }
+
+    // NUEVO - Plan vigente del usuario. Lo usan sesiones, diagnosticos y actividades
+    // para revisar los beneficios. Si no tiene suscripcion activa, se aplica el plan free.
+    @Override
+    public CatalogoPlan planActivoDe(Long usuarioId) {
+        Suscripcion s = sR.buscarActivaPorUsuario(usuarioId);
+        if (s != null) {
+            return s.getCatalogoPlan();
+        }
+        CatalogoPlan free = cpR.buscarPlanFree();
+        if (free == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
+                    "No existe un plan 'free' activo en el catálogo");
+        }
+        return free;
+    }
+
+    // Completa los datos de una suscripcion nueva y la guarda (lo usan US05, US06 y el plan free)
     private void guardarNueva(Suscripcion s) {
         // 1. Buscar el plan elegido y verificar que se pueda contratar
         CatalogoPlan plan = cpR.findById(s.getCatalogoPlan().getCatalogoPlanId())
@@ -105,13 +142,16 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
         // 2. Llenar lo que decide el sistema, no el cliente
         s.setCatalogoPlan(plan);
         s.setFechaInicio(LocalDate.now());
-        s.setFechaFin(LocalDate.now().plusMonths(1));
         s.setEstadoSuscripcion("activa");
 
-        // 3. Si el plan es gratis, no se guardan datos de pago
         if (plan.getPrecioMensualCatalogoPlan() == 0) {
+            // 3a. Plan gratis: no vence y no guarda datos de pago
+            s.setFechaFin(null);
             s.setMetodoPagoSuscripcion(null);
             s.setReferenciaPagoSuscripcion(null);
+        } else {
+            // 3b. Plan pagado: vence en un mes
+            s.setFechaFin(LocalDate.now().plusMonths(1));
         }
 
         sR.save(s);

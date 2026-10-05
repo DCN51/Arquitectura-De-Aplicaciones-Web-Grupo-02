@@ -7,7 +7,7 @@ import pe.edu.upc.arquiwebgrupo02.entities.SesionClinica;
 
 import java.util.List;
 
-public interface ISesionClinicaRepository extends JpaRepository<SesionClinica, Long> {
+public interface ISesionClinicaRepository extends JpaRepository<SesionClinica, Long>  {
 
     // Historial de sesiones del usuario, de la mas reciente a la mas antigua
     @Query(value = "select * from sesiones_clinicas " +
@@ -26,4 +26,10 @@ public interface ISesionClinicaRepository extends JpaRepository<SesionClinica, L
             " where requiere_derivacion = true" +
             " order by fecha_hora_inicio desc", nativeQuery = true)
     public List<SesionClinica> buscarQueRequierenDerivacion();
+
+    // NUEVO: cantidad de sesiones que el usuario inicio en el mes actual (limite del plan)
+    @Query(value = "select count(*) from sesiones_clinicas " +
+            " where usuario_id = :usuarioId" +
+            " and fecha_hora_inicio >= date_trunc('month', current_date)", nativeQuery = true)
+    public int contarSesionesDelMes(@Param("usuarioId") Long usuarioId);
 }

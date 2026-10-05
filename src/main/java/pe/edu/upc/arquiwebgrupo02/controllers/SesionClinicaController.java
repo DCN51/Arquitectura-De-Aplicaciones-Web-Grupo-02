@@ -31,6 +31,7 @@ public class SesionClinicaController {
 
     // HU05 - Iniciar una sesion con la IA (solo se envia el usuarioId)
     @PostMapping
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<SesionClinicaDTO> iniciar(@Valid @RequestBody SesionClinicaDTO dto) {
         Users u = uS.listId(dto.getUsuarioId())
                 .orElseThrow(() ->
@@ -56,6 +57,7 @@ public class SesionClinicaController {
 
     // HU05 y HU14 - Finalizar la sesion con el resultado de la IA
     @PutMapping("/{id}/finalizar")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<SesionClinicaDTO> finalizar(@PathVariable Long id, @RequestBody SesionClinicaDTO dto) {
         SesionClinica datos = new SesionClinica();
         datos.setEmocionDetectada(dto.getEmocionDetectada());
@@ -69,6 +71,7 @@ public class SesionClinicaController {
 
     // Ver una sesion
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<SesionClinicaDTO> listarPorId(@PathVariable Long id) {
         SesionClinica s = scS.listId(id)
                 .orElseThrow(() ->
@@ -81,6 +84,7 @@ public class SesionClinicaController {
 
     // Historial de sesiones del usuario
     @GetMapping("/usuario/{usuarioId}")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<List<SesionClinicaDTO>> historial(@PathVariable Long usuarioId) {
         uS.listId(usuarioId)
                 .orElseThrow(() ->
@@ -97,7 +101,7 @@ public class SesionClinicaController {
 
     // HU11 - Sesiones que requieren derivacion (solo psicologos y admin)
     @GetMapping("/derivaciones")
-    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO', 'ADMINISTRADOR', 'ROLE_ADMINISTRADOR')")
+    @PreAuthorize("hasRole('PSICOLOGO')")
     public ResponseEntity<List<SesionClinicaDTO>> derivaciones() {
         List<SesionClinicaDTO> lista = scS.listarQueRequierenDerivacion()
                 .stream()
@@ -108,6 +112,7 @@ public class SesionClinicaController {
 
     // HU38 - Eliminar una sesion del historial
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         scS.delete(id);
         return ResponseEntity.noContent().build();

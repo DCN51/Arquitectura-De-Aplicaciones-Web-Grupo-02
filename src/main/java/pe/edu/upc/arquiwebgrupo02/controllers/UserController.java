@@ -3,8 +3,7 @@ package pe.edu.upc.arquiwebgrupo02.controllers;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Locale;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 import pe.edu.upc.arquiwebgrupo02.dtos.UserResponseDTO;
 import pe.edu.upc.arquiwebgrupo02.dtos.UserUpdateRequestDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
@@ -33,37 +31,34 @@ public class UserController {
         this.passwordEncoder = passwordEncoder;
     }
 
+    // Por ahora sin control de roles (luego: solo administrador)
     @GetMapping
     public List<UserResponseDTO> list(
             @RequestParam(required = false) Long roleId,
-            @RequestParam(required = false) String estadoCuenta,
-            Authentication authentication) {
-        requireAdministrator(authentication);
+            @RequestParam(required = false) String estadoCuenta) {
         List<Users> users = userRepository.buscarPorRolYEstado(roleId, hasText(estadoCuenta) ? estadoCuenta.trim() : null);
         return users.stream().map(this::toDTO).toList();
     }
 
+    // Por ahora sin control de roles (luego: administrador o dueño)
     @GetMapping("/{userId}")
-    public UserResponseDTO get(@PathVariable Long userId, Authentication authentication) {
-        Users user = findUser(userId);
-        requireOwnerOrAdministrator(authentication, user);
-        return toDTO(user);
+    public UserResponseDTO get(@PathVariable Long userId) {
+        return toDTO(findUser(userId));
     }
 
+    // Por ahora sin control de roles (luego: solo el dueño)
     @PutMapping("/{userId}")
     public UserResponseDTO update(
             @PathVariable Long userId,
-            @Valid @RequestBody UserUpdateRequestDTO request,
-            Authentication authentication) {
+            @Valid @RequestBody UserUpdateRequestDTO request) {
         Users user = findUser(userId);
-        requireOwner(authentication, user);
         updateIfPresent(request, user);
         return toDTO(userRepository.save(user));
     }
 
+    // Por ahora sin control de roles (luego: solo administrador)
     @PatchMapping("/{userId}/deactivate")
-    public UserResponseDTO deactivate(@PathVariable Long userId, Authentication authentication) {
-        requireAdministrator(authentication);
+    public UserResponseDTO deactivate(@PathVariable Long userId) {
         Users user = findUser(userId);
         if (!user.isEnabled()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User account is already inactive");
@@ -95,30 +90,6 @@ public class UserController {
     private Users findUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
-    }
-
-    private void requireOwnerOrAdministrator(Authentication authentication, Users user) {
-        if (!user.getUsername().equals(authentication.getName()) && !isAdministrator(authentication)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to access this user");
-        }
-    }
-
-    private void requireOwner(Authentication authentication, Users user) {
-        if (authentication == null || !user.getUsername().equals(authentication.getName())) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You are not allowed to update this user");
-        }
-    }
-
-    private void requireAdministrator(Authentication authentication) {
-        if (!isAdministrator(authentication)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Administrator role is required");
-        }
-    }
-
-    private boolean isAdministrator(Authentication authentication) {
-        return authentication != null && authentication.getAuthorities().stream()
-                .anyMatch(authority -> authority.getAuthority().equals("ADMINISTRADOR")
-                        || authority.getAuthority().equals("ROLE_ADMINISTRADOR"));
     }
 
     private UserResponseDTO toDTO(Users user) {

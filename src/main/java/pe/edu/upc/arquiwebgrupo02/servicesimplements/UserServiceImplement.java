@@ -10,6 +10,7 @@ import pe.edu.upc.arquiwebgrupo02.entities.Role;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.repositories.IRoleRepository;
 import pe.edu.upc.arquiwebgrupo02.repositories.IUsuarioRepository;
+import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.ISuscripcionService;
 
 import java.util.List;
 import java.util.Locale;
@@ -20,14 +21,17 @@ public class UserServiceImplement implements pe.edu.upc.arquiwebgrupo02.services
     private final IUsuarioRepository usuarioRepository;
     private final IRoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ISuscripcionService suscripcionService;   // NUEVO
 
     public UserServiceImplement(
             IUsuarioRepository usuarioRepository,
             IRoleRepository roleRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            ISuscripcionService suscripcionService) {        // NUEVO
         this.usuarioRepository = usuarioRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.suscripcionService = suscripcionService;        // NUEVO
     }
 
     @Override
@@ -88,11 +92,16 @@ public class UserServiceImplement implements pe.edu.upc.arquiwebgrupo02.services
         user.setTelefono(registro.getTelefono().trim());
         user.setFechaNacimiento(registro.getFechaNacimiento());
         user.setGenero(registro.getGenero().trim());
-        user.setEstadoCuenta("ACTIVO");
         user.setNumeroColegiatura(emptyToNull(registro.getNumeroColegiatura()));
         user.setEspecializacion(emptyToNull(registro.getEspecializacion()));
         user.setAnosExperiencia(registro.getAnosExperiencia());
-        return usuarioRepository.save(user);
+        Users saved = usuarioRepository.save(user);
+
+        // NUEVO: todo paciente nuevo empieza con el plan free
+        if (patient) {
+            suscripcionService.asignarPlanFree(saved);
+        }
+        return saved;
     }
 
     private boolean isBlank(String value) {
