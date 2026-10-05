@@ -48,7 +48,7 @@ public class ActivityController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO')")
+    @PreAuthorize("hasRole('PSICOLOGO')")
     public ResponseEntity<RecommendedActivityDTO> create(@Valid @RequestBody RecommendedActivityDTO request) {
         RecommendedActivity recommendedActivity = new RecommendedActivity();
         apply(request, recommendedActivity);
@@ -61,7 +61,7 @@ public class ActivityController {
     }
 
     @GetMapping("/users/{userId}")
-    @PreAuthorize("hasAnyAuthority('PACIENTE', 'ROLE_PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE')")
     public List<RecommendedActivityDTO> listForUser(
             @PathVariable Long userId,
             @RequestParam(required = false) String status,
@@ -84,7 +84,7 @@ public class ActivityController {
     }
 
     @PutMapping("/{activityId}/complete")
-    @PreAuthorize("hasAnyAuthority('PACIENTE', 'ROLE_PACIENTE')")
+    @PreAuthorize("hasRole('PACIENTE')")
     public RecommendedActivityDTO complete(
             @PathVariable Integer activityId,
             @Valid @RequestBody RecommendedActivityCompletionDTO request,
@@ -101,7 +101,7 @@ public class ActivityController {
     }
 
     @PutMapping("/{activityId}")
-    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO')")
+    @PreAuthorize("hasRole('PSICOLOGO')")
     public RecommendedActivityDTO update(@PathVariable Integer activityId, @Valid @RequestBody RecommendedActivityDTO request) {
         RecommendedActivity recommendedActivity = findActivity(activityId);
         String estado = recommendedActivity.getStatus();
@@ -115,7 +115,7 @@ public class ActivityController {
     }
 
     @DeleteMapping("/{activityId}")
-    @PreAuthorize("hasAnyAuthority('PSICOLOGO', 'ROLE_PSICOLOGO')")
+    @PreAuthorize("hasRole('PSICOLOGO')")
     public ResponseEntity<Void> delete(@PathVariable Integer activityId) {
         RecommendedActivity recommendedActivity = findActivity(activityId);
         if (!isPendiente(recommendedActivity.getStatus())) {
