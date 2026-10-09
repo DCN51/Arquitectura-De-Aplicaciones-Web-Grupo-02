@@ -1,6 +1,5 @@
 package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,14 +31,16 @@ public class JWTUserDetailsService implements UserDetailsService {
                         )
                 );
 
-        GrantedAuthority authority = new SimpleGrantedAuthority(
-                user.getRole().getRol().toUpperCase(Locale.ROOT)
-        );
+        String rol = user.getRole().getRol().toUpperCase(Locale.ROOT);
+        String rolConPrefijo = rol.startsWith("ROLE_") ? rol : "ROLE_" + rol;
 
         return User.builder()
                 .username(user.getUsername())
                 .password(user.getPassword())
-                .authorities(authority)
+                .authorities(
+                        new SimpleGrantedAuthority(rol),
+                        new SimpleGrantedAuthority(rolConPrefijo)
+                )
                 .disabled(!user.isEnabled())
                 .build();
     }
