@@ -37,7 +37,7 @@ public class SuscripcionController {
 
     // US05 - Contratar plan
     @PostMapping
-    @PreAuthorize("hasRole('PACIENTE')")
+    //@PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<SuscripcionDTO> registrar(@Valid @RequestBody SuscripcionDTO dto) {
         Suscripcion s = armarSuscripcion(dto);
         sS.insert(s);
@@ -57,7 +57,7 @@ public class SuscripcionController {
 
     // US06 - Cambiar plan
     @PutMapping("/cambiar-plan")
-    @PreAuthorize("hasRole('PACIENTE')")
+    //@PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<SuscripcionDTO> cambiarPlan(@Valid @RequestBody SuscripcionDTO dto) {
         Suscripcion s = armarSuscripcion(dto);
         sS.cambiarPlan(s);
@@ -68,7 +68,7 @@ public class SuscripcionController {
 
     // US07 - Cancelar suscripcion
     @PutMapping("/usuario/{usuarioId}/cancelar")
-    @PreAuthorize("hasRole('PACIENTE')")
+    //@PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<Void> cancelar(@PathVariable Long usuarioId) {
         uS.listId(usuarioId)
                 .orElseThrow(() ->
@@ -82,7 +82,7 @@ public class SuscripcionController {
 
     // US08 - Consultar historial
     @GetMapping("/usuario/{usuarioId}")
-    @PreAuthorize("hasAnyRole('PACIENTE','ADMINISTRADOR')")
+    //@PreAuthorize("hasAnyRole('PACIENTE','ADMINISTRADOR')")
     public ResponseEntity<List<SuscripcionDTO>> historial(@PathVariable Long usuarioId) {
         List<SuscripcionDTO> lista = sS.historialPorUsuario(usuarioId)
                 .stream()
@@ -93,7 +93,7 @@ public class SuscripcionController {
 
     // US09 - Consultar suscripciones por vencer (@Query)
     @GetMapping("/por-vencer")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<List<SuscripcionDTO>> porVencer(@RequestParam(defaultValue = "7") int dias) {
         List<SuscripcionDTO> lista = sS.porVencer(dias)
                 .stream()
@@ -104,7 +104,7 @@ public class SuscripcionController {
 
     // US10 - Contar suscriptores activos por plan (@Query)
     @GetMapping("/suscriptores-por-plan")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<List<SuscriptoresPorPlanDTO>> suscriptoresPorPlan() {
         List<SuscriptoresPorPlanDTO> lista = sS.contarSuscriptoresActivosPorPlan()
                 .stream()

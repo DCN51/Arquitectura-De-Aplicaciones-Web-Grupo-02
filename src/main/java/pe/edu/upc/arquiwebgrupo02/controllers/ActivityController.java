@@ -48,7 +48,7 @@ public class ActivityController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('PSICOLOGO')")
+    //@PreAuthorize("hasRole('PSICOLOGO')")
     public ResponseEntity<RecommendedActivityDTO> create(@Valid @RequestBody RecommendedActivityDTO request) {
         RecommendedActivity recommendedActivity = new RecommendedActivity();
         apply(request, recommendedActivity);
@@ -61,7 +61,7 @@ public class ActivityController {
     }
 
     @GetMapping("/users/{userId}")
-    @PreAuthorize("hasRole('PACIENTE')")
+    //@PreAuthorize("hasRole('PACIENTE')")
     public List<RecommendedActivityDTO> listForUser(
             @PathVariable Long userId,
             @RequestParam(required = false) String status,
@@ -76,7 +76,7 @@ public class ActivityController {
         if (!isPaciente(user)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Solo un paciente puede consultar sus actividades");
         }
-        requireOwner(authentication, user);
+        //requireOwner(authentication, user);
 
         String estado = status == null || status.isBlank() ? null : status.trim();
         List<RecommendedActivity> activities = recommendedActivityService.buscarPorPaciente(userId, estado, from, to);
@@ -84,13 +84,13 @@ public class ActivityController {
     }
 
     @PutMapping("/{activityId}/complete")
-    @PreAuthorize("hasRole('PACIENTE')")
+    //@PreAuthorize("hasRole('PACIENTE')")
     public RecommendedActivityDTO complete(
             @PathVariable Integer activityId,
             @Valid @RequestBody RecommendedActivityCompletionDTO request,
             Authentication authentication) {
         RecommendedActivity recommendedActivity = findActivity(activityId);
-        requireOwner(authentication, recommendedActivity.getUser());
+        //requireOwner(authentication, recommendedActivity.getUser());
         if (!isPendiente(recommendedActivity.getStatus())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only pending activities can be completed");
         }
@@ -101,7 +101,7 @@ public class ActivityController {
     }
 
     @PutMapping("/{activityId}")
-    @PreAuthorize("hasRole('PSICOLOGO')")
+    //@PreAuthorize("hasRole('PSICOLOGO')")
     public RecommendedActivityDTO update(@PathVariable Integer activityId, @Valid @RequestBody RecommendedActivityDTO request) {
         RecommendedActivity recommendedActivity = findActivity(activityId);
         String estado = recommendedActivity.getStatus();
@@ -115,7 +115,7 @@ public class ActivityController {
     }
 
     @DeleteMapping("/{activityId}")
-    @PreAuthorize("hasRole('PSICOLOGO')")
+    //@PreAuthorize("hasRole('PSICOLOGO')")
     public ResponseEntity<Void> delete(@PathVariable Integer activityId) {
         RecommendedActivity recommendedActivity = findActivity(activityId);
         if (!isPendiente(recommendedActivity.getStatus())) {

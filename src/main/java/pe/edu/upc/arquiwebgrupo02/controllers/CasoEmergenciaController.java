@@ -35,7 +35,7 @@ public class CasoEmergenciaController {
     }
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('PSICOLOGO','ADMINISTRADOR')")
+    //@PreAuthorize("hasAnyRole('PSICOLOGO','ADMINISTRADOR')")
     public ResponseEntity<List<CasoEmergenciaDTO>> listar() {
         List<CasoEmergenciaDTO> lista = ceS.list()
                 .stream()
@@ -45,7 +45,7 @@ public class CasoEmergenciaController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('PACIENTE')")
+    //@PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<CasoEmergenciaDTO> registrar(@Valid @RequestBody CasoEmergenciaDTO dto) {
         CasoEmergencia c = new CasoEmergencia();
         llenarDesdeDTO(c, dto);
@@ -63,7 +63,7 @@ public class CasoEmergenciaController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('PSICOLOGO','ADMINISTRADOR')")
+    //@PreAuthorize("hasAnyRole('PSICOLOGO','ADMINISTRADOR')")
     public ResponseEntity<CasoEmergenciaDTO> buscarPorId(@PathVariable Long id) {
         CasoEmergencia c = ceS.listId(id)
                 .orElseThrow(() ->
@@ -75,7 +75,7 @@ public class CasoEmergenciaController {
     }
 
     @PutMapping
-    @PreAuthorize("hasRole('PSICOLOGO')")
+    //@PreAuthorize("hasRole('PSICOLOGO')")
     public ResponseEntity<CasoEmergenciaDTO> actualizar(@Valid @RequestBody CasoEmergenciaDTO dto) {
         CasoEmergencia existente = ceS.listId(dto.getCasoEmergenciaId())
                 .orElseThrow(() ->
@@ -89,7 +89,7 @@ public class CasoEmergenciaController {
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         CasoEmergencia c = ceS.listId(id)
                 .orElseThrow(() ->
@@ -103,7 +103,7 @@ public class CasoEmergenciaController {
 
     // Query 1 - Casos pendientes ordenados por urgencia
     @GetMapping("/pendientes")
-    @PreAuthorize("hasRole('PSICOLOGO')")
+    //@PreAuthorize("hasRole('PSICOLOGO')")
     public ResponseEntity<List<CasoEmergenciaDTO>> pendientesPorUrgencia() {
         List<CasoEmergenciaDTO> lista = ceS.listarPendientesPorUrgencia()
                 .stream()
@@ -114,7 +114,7 @@ public class CasoEmergenciaController {
 
     // Query 2 - Cantidad de casos por psicologo
     @GetMapping("/por-psicologo")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<List<CasosPorPsicologoDTO>> casosPorPsicologo() {
         List<CasosPorPsicologoDTO> lista = ceS.contarCasosPorPsicologo()
                 .stream()

@@ -30,7 +30,7 @@ public class CatalogoPlanController {
 
     // US04 - Listar planes disponibles (solo los activos)
     @GetMapping
-    @PreAuthorize("hasAnyRole('PACIENTE','PSICOLOGO','ADMINISTRADOR')")
+    //@PreAuthorize("hasAnyRole('PACIENTE','PSICOLOGO','ADMINISTRADOR')")
     public ResponseEntity<List<CatalogoPlanDTO>> listar() {
         List<CatalogoPlanDTO> lista = cpS.list()
                 .stream()
@@ -42,7 +42,7 @@ public class CatalogoPlanController {
 
     // US01 - Registrar plan
     @PostMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<CatalogoPlanDTO> registrar(@Valid @RequestBody CatalogoPlanDTO dto) {
         CatalogoPlan c = modelMapper.map(dto, CatalogoPlan.class);
         c.setCatalogoPlanId(null);         // siempre es un plan nuevo
@@ -64,7 +64,7 @@ public class CatalogoPlanController {
 
     // US02 - Actualizar plan (no cambia su estado activo/inactivo)
     @PutMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<CatalogoPlanDTO> actualizar(@Valid @RequestBody CatalogoPlanDTO dto) {
         CatalogoPlan existente = buscarPlan(dto.getCatalogoPlanId());
 
@@ -82,9 +82,16 @@ public class CatalogoPlanController {
         return ResponseEntity.ok(modelMapper.map(c, CatalogoPlanDTO.class));
     }
 
+    // Apoyo para US02 - obtener el plan a editar
+    @GetMapping("/{id}")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
+    public ResponseEntity<CatalogoPlanDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(modelMapper.map(buscarPlan(id), CatalogoPlanDTO.class));
+    }
+
     // US03 - Desactivar plan (solo se envia el id)
     @PatchMapping("/{id}/desactivar")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<CatalogoPlanDTO> desactivar(@PathVariable Long id) {
         CatalogoPlan c = buscarPlan(id);
 
