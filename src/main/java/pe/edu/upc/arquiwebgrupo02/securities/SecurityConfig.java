@@ -150,6 +150,8 @@ public class SecurityConfig {
                         .requestMatchers( HttpMethod.POST, "/api/activities" ).permitAll()
                         .requestMatchers( HttpMethod.PUT, "/api/activities/**" ).permitAll()
                         .requestMatchers( HttpMethod.DELETE, "/api/activities/**" ).permitAll()
+                        .requestMatchers( "/api/sesiones/**" ).permitAll()
+                        .requestMatchers( "/api/diagnosticos/**" ).permitAll()
 
                         // Swagger / OpenAPI
                         .requestMatchers(
