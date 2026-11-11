@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,6 +15,11 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 @EnableMethodSecurity
@@ -26,14 +30,15 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
     }
 
+    // 1. Codificación de contraseñas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // 2. Proveedor de autenticación
     @Bean
     public AuthenticationProvider authenticationProvider() {
-
         DaoAuthenticationProvider provider =
                 new DaoAuthenticationProvider(userDetailsService);
 
@@ -42,20 +47,63 @@ public class SecurityConfig {
         return provider;
     }
 
+    // 3. Un solo AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(
-            org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration configuration)
-            throws Exception {
-
+            AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 
+    // 4. Configuración global de CORS
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOrigins(
+                List.of("http://localhost:4200")
+        );
+
+        configuration.setAllowedMethods(
+                List.of(
+                        "GET", "POST", "PUT",
+                        "DELETE", "PATCH", "OPTIONS"
+                )
+        );
+
+        configuration.setAllowedHeaders(
+                List.of(
+                        "Authorization",
+                        "Content-Type",
+                        "Accept"
+                )
+        );
+
+        configuration.setExposedHeaders(
+                List.of("Authorization")
+        );
+
+        // Para JWT enviado en la cabecera Authorization
+        configuration.setAllowCredentials(false);
+
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
+
+    // 5. Configuración principal de Spring Security
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
 
         http
-                .cors(Customizer.withDefaults())
+                .cors(cors ->
+                        cors.configurationSource(corsConfigurationSource())
+                )
 
                 .csrf(csrf -> csrf.disable())
 
@@ -65,35 +113,61 @@ public class SecurityConfig {
                         )
                 )
 
+                .authenticationProvider(authenticationProvider())
+
                 .authorizeHttpRequests(auth -> auth
 
-                        // Login público
-                        .requestMatchers("/login").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
-
-                        // El chat está disponible para pacientes y psicólogos autenticados
-                        .requestMatchers("/chat/**").hasAnyAuthority(
-                                "PSICOLOGO",
-                                "ROLE_PSICOLOGO",
-                                "PACIENTE",
-                                "ROLE_PACIENTE"
-                        )
-
-                        // Swagger
+                        // Permite las solicitudes previas de CORS
                         .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                HttpMethod.OPTIONS, "/**"
                         ).permitAll()
 
-                        // CORS
-                        .requestMatchers(HttpMethod.OPTIONS, "/**")
-                        .permitAll()
+                        // Inicio de sesión público
+                        .requestMatchers(
+                                HttpMethod.POST, "/login" ).permitAll()
+                        // Catálogo de planes
+                        .requestMatchers( HttpMethod.GET, "/api/CatalogoPlan" ).permitAll()
+                        .requestMatchers( HttpMethod.POST, "/api/CatalogoPlan" ).permitAll()
+                        .requestMatchers( HttpMethod.PUT, "/api/CatalogoPlan" ).permitAll()
+                        .requestMatchers( HttpMethod.PATCH, "/api/CatalogoPlan/**" ).permitAll()
+                        .requestMatchers( HttpMethod.GET, "/api/CatalogoPlan/**" ).permitAll()
 
-                        // Todo lo demás requiere autenticación
+                        // Suscripciones
+                        .requestMatchers( HttpMethod.POST, "/api/suscripciones" ).permitAll()
+                        .requestMatchers( HttpMethod.PUT, "/api/suscripciones/**" ).permitAll()
+                        .requestMatchers( HttpMethod.GET, "/api/suscripciones/**" ).permitAll()
+
+                        // Roles
+                        .requestMatchers( HttpMethod.GET, "/api/roles" ).permitAll()
+
+                        // Usuarios
+                        .requestMatchers( HttpMethod.GET, "/api/users/**" ).permitAll()
+                        .requestMatchers( HttpMethod.PUT, "/api/users/**" ).permitAll()
+                        .requestMatchers( HttpMethod.PATCH, "/api/users/**" ).permitAll()
+
+                        // Actividades recomendadas
+                        .requestMatchers( HttpMethod.GET, "/api/activities/**" ).permitAll()
+                        .requestMatchers( HttpMethod.POST, "/api/activities" ).permitAll()
+                        .requestMatchers( HttpMethod.PUT, "/api/activities/**" ).permitAll()
+                        .requestMatchers( HttpMethod.DELETE, "/api/activities/**" ).permitAll()
+
+                        // Swagger / OpenAPI
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs",
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml"
+                        ).permitAll()
+
+                        // Respuesta de errores de Spring Boot (si no, todo error sale como 401)
+                        .requestMatchers("/error").permitAll()
+
+                        // Los demás endpoints requieren autenticación
                         .anyRequest().authenticated()
                 )
 
+                // Validación de JWT
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
                                 jwt.jwtAuthenticationConverter(

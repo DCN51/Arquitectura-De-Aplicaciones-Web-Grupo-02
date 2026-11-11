@@ -27,7 +27,7 @@ public class RoleController {
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    //@PreAuthorize("hasRole('ADMINISTRADOR')")
     public List<RoleDTO> list() {
         return roleService.list().stream().map(this::toDTO).toList();
     }
