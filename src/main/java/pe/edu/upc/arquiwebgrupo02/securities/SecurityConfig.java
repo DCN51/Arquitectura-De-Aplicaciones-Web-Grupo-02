@@ -125,33 +125,40 @@ public class SecurityConfig {
                         // Inicio de sesión público
                         .requestMatchers(
                                 HttpMethod.POST, "/login" ).permitAll()
+                        // Inicio de sesión público
+                        .requestMatchers(
+                                HttpMethod.POST, "/login" ).permitAll()
+
+                        // Registro público (aún no tiene token)
+                        .requestMatchers(
+                                HttpMethod.POST, "/api/usuarios" ).permitAll()
                         // Catálogo de planes
-                        .requestMatchers( HttpMethod.GET, "/api/CatalogoPlan" ).permitAll()
-                        .requestMatchers( HttpMethod.POST, "/api/CatalogoPlan" ).permitAll()
-                        .requestMatchers( HttpMethod.PUT, "/api/CatalogoPlan" ).permitAll()
-                        .requestMatchers( HttpMethod.PATCH, "/api/CatalogoPlan/**" ).permitAll()
-                        .requestMatchers( HttpMethod.GET, "/api/CatalogoPlan/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.GET, "/api/CatalogoPlan" ).permitAll()
+                        //.requestMatchers( HttpMethod.POST, "/api/CatalogoPlan" ).permitAll()
+                        //.requestMatchers( HttpMethod.PUT, "/api/CatalogoPlan" ).permitAll()
+                        //.requestMatchers( HttpMethod.PATCH, "/api/CatalogoPlan/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.GET, "/api/CatalogoPlan/**" ).permitAll()
 
                         // Suscripciones
-                        .requestMatchers( HttpMethod.POST, "/api/suscripciones" ).permitAll()
-                        .requestMatchers( HttpMethod.PUT, "/api/suscripciones/**" ).permitAll()
-                        .requestMatchers( HttpMethod.GET, "/api/suscripciones/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.POST, "/api/suscripciones" ).permitAll()
+                        //.requestMatchers( HttpMethod.PUT, "/api/suscripciones/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.GET, "/api/suscripciones/**" ).permitAll()
 
                         // Roles
-                        .requestMatchers( HttpMethod.GET, "/api/roles" ).permitAll()
+                        //.requestMatchers( HttpMethod.GET, "/api/roles" ).permitAll()
 
                         // Usuarios
-                        .requestMatchers( HttpMethod.GET, "/api/users/**" ).permitAll()
-                        .requestMatchers( HttpMethod.PUT, "/api/users/**" ).permitAll()
-                        .requestMatchers( HttpMethod.PATCH, "/api/users/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.GET, "/api/users/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.PUT, "/api/users/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.PATCH, "/api/users/**" ).permitAll()
 
                         // Actividades recomendadas
-                        .requestMatchers( HttpMethod.GET, "/api/activities/**" ).permitAll()
-                        .requestMatchers( HttpMethod.POST, "/api/activities" ).permitAll()
-                        .requestMatchers( HttpMethod.PUT, "/api/activities/**" ).permitAll()
-                        .requestMatchers( HttpMethod.DELETE, "/api/activities/**" ).permitAll()
-                        .requestMatchers( "/api/sesiones/**" ).permitAll()
-                        .requestMatchers( "/api/diagnosticos/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.GET, "/api/activities/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.POST, "/api/activities" ).permitAll()
+                        //.requestMatchers( HttpMethod.PUT, "/api/activities/**" ).permitAll()
+                        //.requestMatchers( HttpMethod.DELETE, "/api/activities/**" ).permitAll()
+                        //.requestMatchers( "/api/sesiones/**" ).permitAll()
+                        //.requestMatchers( "/api/diagnosticos/**" ).permitAll()
 
                         // Swagger / OpenAPI
                         .requestMatchers(
