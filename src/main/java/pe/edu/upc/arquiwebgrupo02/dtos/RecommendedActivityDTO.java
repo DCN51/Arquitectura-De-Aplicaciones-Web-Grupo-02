@@ -9,24 +9,24 @@ import java.time.LocalDate;
 public class RecommendedActivityDTO {
     private Integer recommendedActivityId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "El id del paciente es obligatorio")
+    @Positive(message = "El id del paciente debe ser mayor que 0")
     private Long userId;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "El id del diagnóstico es obligatorio")
+    @Positive(message = "El id del diagnóstico debe ser mayor que 0")
     private Long diagnosisId;
 
-    @NotBlank
-    @Size(max = 100)
+    @NotBlank(message = "El título es obligatorio")
+    @Size(max = 100, message = "El título no puede tener más de 100 caracteres")
     private String title;
 
-    @NotBlank
-    @Size(max = 255)
+    @NotBlank(message = "La descripción es obligatoria")
+    @Size(max = 255, message = "La descripción no puede tener más de 255 caracteres")
     private String description;
 
-    @NotBlank
-    @Size(max = 50)
+    @NotBlank(message = "El tipo es obligatorio")
+    @Size(max = 50, message = "El tipo no puede tener más de 50 caracteres")
     private String type;
 
     private LocalDate assignedDate;

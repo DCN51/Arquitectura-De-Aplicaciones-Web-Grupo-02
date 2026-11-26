@@ -1,5 +1,7 @@
 package pe.edu.upc.arquiwebgrupo02.dtos;
 
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDateTime;
 
 public class SesionClinicaDTO {
@@ -24,6 +26,7 @@ public class SesionClinicaDTO {
     private LocalDateTime fechaHoraFin;
 
     // Estos los llena la IA al finalizar la sesion
+    @Size(max = 50, message = "La emoción detectada no puede tener más de 50 caracteres")
     private String emocionDetectada;
 
     private String nivelUrgencia;

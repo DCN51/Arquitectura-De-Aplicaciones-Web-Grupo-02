@@ -150,6 +150,13 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
             s.setMetodoPagoSuscripcion(null);
             s.setReferenciaPagoSuscripcion(null);
         } else {
+            if (s.getMetodoPagoSuscripcion() == null || s.getMetodoPagoSuscripcion().isBlank()
+                    || s.getReferenciaPagoSuscripcion() == null || s.getReferenciaPagoSuscripcion().isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "El método y la referencia de pago son obligatorios para planes de pago");
+            }
+            s.setMetodoPagoSuscripcion(s.getMetodoPagoSuscripcion().trim());
+            s.setReferenciaPagoSuscripcion(s.getReferenciaPagoSuscripcion().trim());
             // 3b. Plan pagado: vence en un mes
             s.setFechaFin(LocalDate.now().plusMonths(1));
         }

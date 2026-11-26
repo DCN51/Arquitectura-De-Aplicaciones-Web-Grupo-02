@@ -6,8 +6,8 @@ import jakarta.validation.constraints.Size;
 public class RoleDTO {
     private Long roleId;
 
-    @NotBlank(message = "Role name is required")
-    @Size(max = 30, message = "Role name cannot exceed 30 characters")
+    @NotBlank(message = "El nombre del rol es obligatorio")
+    @Size(max = 30, message = "El nombre del rol no puede tener más de 30 caracteres")
     private String name;
 
     public Long getRoleId() {

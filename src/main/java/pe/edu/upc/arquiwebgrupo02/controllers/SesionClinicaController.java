@@ -1,5 +1,6 @@
 package pe.edu.upc.arquiwebgrupo02.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -44,7 +45,7 @@ public class SesionClinicaController {
 
     @PutMapping("/{id}/finalizar")
     @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<SesionClinicaDTO> finalizar(@PathVariable Long id, @RequestBody SesionClinicaDTO dto,
+    public ResponseEntity<SesionClinicaDTO> finalizar(@PathVariable Long id, @Valid @RequestBody SesionClinicaDTO dto,
                                                       Authentication authentication) {
         SesionClinica datos = new SesionClinica();
         datos.setEmocionDetectada(dto.getEmocionDetectada());

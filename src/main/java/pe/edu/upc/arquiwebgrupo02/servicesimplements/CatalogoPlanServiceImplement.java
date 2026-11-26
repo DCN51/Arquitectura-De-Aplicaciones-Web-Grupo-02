@@ -21,6 +21,7 @@ public class CatalogoPlanServiceImplement implements ICatalogoPlanService {
 
     @Override
     public void insert(CatalogoPlan c) {
+        validarLimiteSesiones(c);
         if (cpS.contarPorNombre(c.getNombreCatalogoPlan()) > 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un plan con ese nombre");
         }
@@ -29,6 +30,7 @@ public class CatalogoPlanServiceImplement implements ICatalogoPlanService {
 
     @Override
     public void update(CatalogoPlan c) {
+        validarLimiteSesiones(c);
         if (cpS.contarPorNombreExcluyendoId(c.getNombreCatalogoPlan(), c.getCatalogoPlanId()) > 0) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un plan con ese nombre");
         }
@@ -43,5 +45,12 @@ public class CatalogoPlanServiceImplement implements ICatalogoPlanService {
     @Override
     public Optional<CatalogoPlan> listId(Long id) {
         return cpS.findById(id);
+    }
+
+    private void validarLimiteSesiones(CatalogoPlan c) {
+        if (c.getLimiteSesionesMes() == 0 || c.getLimiteSesionesMes() < -1) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El límite de sesiones debe ser -1 (ilimitadas) o un número mayor que 0");
+        }
     }
 }

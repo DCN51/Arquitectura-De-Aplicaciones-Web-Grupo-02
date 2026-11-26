@@ -1,5 +1,6 @@
 package pe.edu.upc.arquiwebgrupo02.controllers;
 
+import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -36,7 +37,7 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<LoginResponseDTO> login(
-            @RequestBody LoginRequestDTO request) {
+            @Valid @RequestBody LoginRequestDTO request) {
 
         Authentication authentication =
                 authenticationManager.authenticate(

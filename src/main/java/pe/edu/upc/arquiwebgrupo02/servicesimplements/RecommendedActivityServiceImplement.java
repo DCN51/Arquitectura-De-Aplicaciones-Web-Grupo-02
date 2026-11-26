@@ -130,6 +130,9 @@ public class RecommendedActivityServiceImplement implements IRecommendedActivity
         if (!diagnostico.getUsuario().getId().equals(paciente.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El diagnóstico no pertenece al paciente indicado");
         }
+        if (diagnostico.getValidacionPsicologo() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El diagnóstico aún no ha sido validado por un psicólogo");
+        }
         actividad.setUser(paciente);
         actividad.setDiagnosticoClinico(diagnostico);
         actividad.setTitle(datos.getTitle().trim());
