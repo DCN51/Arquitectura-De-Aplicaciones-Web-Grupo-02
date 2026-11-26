@@ -16,6 +16,8 @@ import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.securities.JwtTokenService;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService;
 
+import java.util.Locale;
+
 @RestController
 @RequestMapping("/login")
 public class LoginController {
@@ -60,10 +62,7 @@ public class LoginController {
                         token,
                         usuario.getId(),
                         userDetails.getUsername(),
-                        userDetails.getAuthorities().stream()
-                                .map(authority -> authority.getAuthority())
-                                .findFirst()
-                                .orElseThrow(),
+                        usuario.getRole().getRol().toUpperCase(Locale.ROOT),
                         usuario.getNombres(),
                         usuario.getApellidos()
                 )
