@@ -1,6 +1,7 @@
 package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -134,5 +135,38 @@ public class UserServiceImplement implements pe.edu.upc.arquiwebgrupo02.services
     @Override
     public Optional<Users> listId(Long id) {
         return usuarioRepository.findById(id);
+    }
+
+    @Override
+    public Users usuarioActual(Authentication authentication) {
+        if (authentication == null || isBlank(authentication.getName())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Debes iniciar sesión");
+        }
+        return usuarioRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "El usuario de la sesión ya no existe"));
+    }
+
+    @Override
+    public boolean esPaciente(Users usuario) {
+        return tieneRol(usuario, "PACIENTE");
+    }
+
+    @Override
+    public boolean esPsicologo(Users usuario) {
+        return tieneRol(usuario, "PSICOLOGO");
+    }
+
+    @Override
+    public boolean esAdministrador(Users usuario) {
+        return tieneRol(usuario, "ADMINISTRADOR");
+    }
+
+    private boolean tieneRol(Users usuario, String rol) {
+        if (usuario == null || usuario.getRole() == null || usuario.getRole().getRol() == null) {
+            return false;
+        }
+        String nombre = usuario.getRole().getRol().toUpperCase(Locale.ROOT);
+        return nombre.equals(rol) || nombre.equals("ROLE_" + rol);
     }
 }
