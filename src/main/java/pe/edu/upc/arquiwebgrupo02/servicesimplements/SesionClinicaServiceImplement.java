@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import pe.edu.upc.arquiwebgrupo02.entities.SesionClinica;
+import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.repositories.IDiagnosticoClinicoRepository;
 import pe.edu.upc.arquiwebgrupo02.repositories.ISesionClinicaRepository;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.ISesionClinicaService;
@@ -23,12 +24,13 @@ public class SesionClinicaServiceImplement implements ISesionClinicaService {
     }
 
     @Override
-    public SesionClinica iniciar(SesionClinica s) {
-        if (scR.buscarEnCursoPorUsuario(s.getUsuario().getId()) != null) {
+    public SesionClinica iniciar(Users paciente) {
+        if (scR.buscarEnCursoPorUsuario(paciente.getId()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya tienes una sesión en curso");
         }
 
-        s.setSesionClinicaId(null);
+        SesionClinica s = new SesionClinica();
+        s.setUsuario(paciente);
         s.setFechaHoraInicio(LocalDateTime.now());
         s.setFechaHoraFin(null);
         s.setEstado("en_curso");
@@ -41,9 +43,8 @@ public class SesionClinicaServiceImplement implements ISesionClinicaService {
     }
 
     @Override
-    public SesionClinica finalizar(Long sesionClinicaId, SesionClinica datos) {
-        SesionClinica actual = scR.findById(sesionClinicaId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
+    public SesionClinica finalizar(Long sesionClinicaId, SesionClinica datos, Users paciente) {
+        SesionClinica actual = buscarDelPaciente(sesionClinicaId, paciente);
 
         if (!"en_curso".equals(actual.getEstado())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "La sesión ya fue finalizada");
@@ -73,6 +74,16 @@ public class SesionClinicaServiceImplement implements ISesionClinicaService {
     }
 
     @Override
+    public SesionClinica buscarDelPaciente(Long sesionClinicaId, Users paciente) {
+        SesionClinica s = scR.findById(sesionClinicaId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
+        if (!s.getUsuario().getId().equals(paciente.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permiso para acceder a esta sesión");
+        }
+        return s;
+    }
+
+    @Override
     public List<SesionClinica> historialPorUsuario(Long usuarioId) {
         return scR.buscarHistorialPorUsuario(usuarioId);
     }
@@ -83,9 +94,8 @@ public class SesionClinicaServiceImplement implements ISesionClinicaService {
     }
 
     @Override
-    public void delete(Long sesionClinicaId) {
-        SesionClinica s = scR.findById(sesionClinicaId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sesión no encontrada"));
+    public void delete(Long sesionClinicaId, Users paciente) {
+        SesionClinica s = buscarDelPaciente(sesionClinicaId, paciente);
         if ("en_curso".equals(s.getEstado())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No puedes eliminar una sesión en curso");
         }

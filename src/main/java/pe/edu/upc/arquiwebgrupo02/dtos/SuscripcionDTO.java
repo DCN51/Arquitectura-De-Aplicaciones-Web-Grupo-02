@@ -20,7 +20,6 @@ public class SuscripcionDTO {
 
     private String referenciaPagoSuscripcion;
 
-    @NotNull(message = "El id del usuario es obligatorio")
     private Long usuarioId;
 
     @NotNull(message = "El id del plan es obligatorio")

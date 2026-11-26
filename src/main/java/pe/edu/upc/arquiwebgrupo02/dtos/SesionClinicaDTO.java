@@ -1,14 +1,11 @@
 package pe.edu.upc.arquiwebgrupo02.dtos;
 
-import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDateTime;
 
 public class SesionClinicaDTO {
 
     private Long sesionClinicaId;
 
-    @NotNull(message = "El id del usuario es obligatorio")
     private Long usuarioId;
 
     // Fechas y estado NO se validan: los pone el servicio, el cliente no los envia

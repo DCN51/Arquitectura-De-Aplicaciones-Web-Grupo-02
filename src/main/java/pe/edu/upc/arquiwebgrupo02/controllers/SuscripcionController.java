@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.arquiwebgrupo02.dtos.SuscripcionDTO;
@@ -38,8 +39,9 @@ public class SuscripcionController {
     // US05 - Contratar plan
     @PostMapping
     @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<SuscripcionDTO> registrar(@Valid @RequestBody SuscripcionDTO dto) {
-        Suscripcion s = armarSuscripcion(dto);
+    public ResponseEntity<SuscripcionDTO> registrar(@Valid @RequestBody SuscripcionDTO dto,
+                                                    Authentication authentication) {
+        Suscripcion s = armarSuscripcion(dto, uS.usuarioActual(authentication));
         sS.insert(s);
 
         SuscripcionDTO responseDTO = modelMapper.map(s, SuscripcionDTO.class);
@@ -58,8 +60,9 @@ public class SuscripcionController {
     // US06 - Cambiar plan
     @PutMapping("/cambiar-plan")
     @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<SuscripcionDTO> cambiarPlan(@Valid @RequestBody SuscripcionDTO dto) {
-        Suscripcion s = armarSuscripcion(dto);
+    public ResponseEntity<SuscripcionDTO> cambiarPlan(@Valid @RequestBody SuscripcionDTO dto,
+                                                      Authentication authentication) {
+        Suscripcion s = armarSuscripcion(dto, uS.usuarioActual(authentication));
         sS.cambiarPlan(s);
 
         SuscripcionDTO responseDTO = modelMapper.map(s, SuscripcionDTO.class);
@@ -67,28 +70,25 @@ public class SuscripcionController {
     }
 
     // US07 - Cancelar suscripcion
-    @PutMapping("/usuario/{usuarioId}/cancelar")
+    @PutMapping("/cancelar")
     @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<Void> cancelar(@PathVariable Long usuarioId) {
-        uS.listId(usuarioId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "No existe el usuario con el id: " + usuarioId
-                        )
-                );
-        sS.cancelar(usuarioId);
+    public ResponseEntity<Void> cancelar(Authentication authentication) {
+        sS.cancelar(uS.usuarioActual(authentication).getId());
         return ResponseEntity.ok().build();
     }
 
     // US08 - Consultar historial
+    @GetMapping("/mis-suscripciones")
+    @PreAuthorize("hasRole('PACIENTE')")
+    public ResponseEntity<List<SuscripcionDTO>> misSuscripciones(Authentication authentication) {
+        return ResponseEntity.ok(historialDe(uS.usuarioActual(authentication).getId()));
+    }
+
     @GetMapping("/usuario/{usuarioId}")
-    @PreAuthorize("hasAnyRole('PACIENTE','ADMINISTRADOR')")
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<List<SuscripcionDTO>> historial(@PathVariable Long usuarioId) {
-        List<SuscripcionDTO> lista = sS.historialPorUsuario(usuarioId)
-                .stream()
-                .map(s -> modelMapper.map(s, SuscripcionDTO.class))
-                .toList();
-        return ResponseEntity.ok(lista);
+        uS.buscarPorId(usuarioId);
+        return ResponseEntity.ok(historialDe(usuarioId));
     }
 
     // US09 - Consultar suscripciones por vencer (@Query)
@@ -118,15 +118,14 @@ public class SuscripcionController {
         return ResponseEntity.ok(lista);
     }
 
-    // Busca el usuario y el plan (como hace la profesora con el invernadero)
-    // y arma la suscripcion. Las fechas y el estado los pone el servicio.
-    private Suscripcion armarSuscripcion(SuscripcionDTO dto) {
-        Users u = uS.listId(dto.getUsuarioId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "No existe el usuario con el id: " + dto.getUsuarioId()
-                        )
-                );
+    private List<SuscripcionDTO> historialDe(Long usuarioId) {
+        return sS.historialPorUsuario(usuarioId)
+                .stream()
+                .map(s -> modelMapper.map(s, SuscripcionDTO.class))
+                .toList();
+    }
+
+    private Suscripcion armarSuscripcion(SuscripcionDTO dto, Users usuario) {
         CatalogoPlan p = cpS.listId(dto.getCatalogoPlanId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
@@ -134,10 +133,11 @@ public class SuscripcionController {
                         )
                 );
 
-        Suscripcion s = modelMapper.map(dto, Suscripcion.class);
-        s.setSuscripcionId(null);      // siempre es una suscripcion nueva
-        s.setUsuario(u);
+        Suscripcion s = new Suscripcion();
+        s.setUsuario(usuario);
         s.setCatalogoPlan(p);
+        s.setMetodoPagoSuscripcion(dto.getMetodoPagoSuscripcion());
+        s.setReferenciaPagoSuscripcion(dto.getReferenciaPagoSuscripcion());
         return s;
     }
 }
