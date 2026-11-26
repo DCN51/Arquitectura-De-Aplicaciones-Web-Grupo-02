@@ -3,11 +3,13 @@ package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import pe.edu.upc.arquiwebgrupo02.entities.CatalogoPlan;
 import pe.edu.upc.arquiwebgrupo02.entities.SesionClinica;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.repositories.IDiagnosticoClinicoRepository;
 import pe.edu.upc.arquiwebgrupo02.repositories.ISesionClinicaRepository;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.ISesionClinicaService;
+import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.ISuscripcionService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,16 +19,25 @@ import java.util.Optional;
 public class SesionClinicaServiceImplement implements ISesionClinicaService {
     private final ISesionClinicaRepository scR;
     private final IDiagnosticoClinicoRepository dcR;
+    private final ISuscripcionService sS;
 
-    public SesionClinicaServiceImplement(ISesionClinicaRepository scR, IDiagnosticoClinicoRepository dcR) {
+    public SesionClinicaServiceImplement(ISesionClinicaRepository scR, IDiagnosticoClinicoRepository dcR,
+                                         ISuscripcionService sS) {
         this.scR = scR;
         this.dcR = dcR;
+        this.sS = sS;
     }
 
     @Override
     public SesionClinica iniciar(Users paciente) {
         if (scR.buscarEnCursoPorUsuario(paciente.getId()) != null) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya tienes una sesión en curso");
+        }
+
+        CatalogoPlan plan = sS.planActivoDe(paciente.getId());
+        int limite = plan.getLimiteSesionesMes();
+        if (limite != -1 && scR.contarSesionesDelMes(paciente.getId()) >= limite) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Alcanzaste el límite de sesiones de tu plan este mes");
         }
 
         SesionClinica s = new SesionClinica();
