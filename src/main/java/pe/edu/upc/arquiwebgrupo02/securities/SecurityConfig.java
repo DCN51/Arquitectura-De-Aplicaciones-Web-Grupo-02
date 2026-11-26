@@ -132,6 +132,8 @@ public class SecurityConfig {
                         // Registro público (aún no tiene token)
                         .requestMatchers(
                                 HttpMethod.POST, "/api/usuarios" ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET, "/api/roles/registro" ).permitAll()
                         // Catálogo de planes
                         //.requestMatchers( HttpMethod.GET, "/api/CatalogoPlan" ).permitAll()
                         //.requestMatchers( HttpMethod.POST, "/api/CatalogoPlan" ).permitAll()
