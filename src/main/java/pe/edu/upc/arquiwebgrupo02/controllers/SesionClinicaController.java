@@ -1,6 +1,5 @@
 package pe.edu.upc.arquiwebgrupo02.controllers;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -20,12 +19,10 @@ import java.util.List;
 public class SesionClinicaController {
     private final ISesionClinicaService scS;
     private final IUserService uS;
-    private final ModelMapper modelMapper;
 
-    public SesionClinicaController(ISesionClinicaService scS, IUserService uS, ModelMapper modelMapper) {
+    public SesionClinicaController(ISesionClinicaService scS, IUserService uS) {
         this.scS = scS;
         this.uS = uS;
-        this.modelMapper = modelMapper;
     }
 
     @PostMapping
@@ -42,7 +39,7 @@ public class SesionClinicaController {
 
         return ResponseEntity
                 .created(location)
-                .body(modelMapper.map(creada, SesionClinicaDTO.class));
+                .body(toDTO(creada));
     }
 
     @PutMapping("/{id}/finalizar")
@@ -56,7 +53,7 @@ public class SesionClinicaController {
         datos.setRequiereDerivacion(dto.getRequiereDerivacion());
 
         SesionClinica finalizada = scS.finalizar(id, datos, uS.usuarioActual(authentication));
-        return ResponseEntity.ok(modelMapper.map(finalizada, SesionClinicaDTO.class));
+        return ResponseEntity.ok(toDTO(finalizada));
     }
 
     @GetMapping("/mis-sesiones")
@@ -65,7 +62,7 @@ public class SesionClinicaController {
         Users paciente = uS.usuarioActual(authentication);
         List<SesionClinicaDTO> lista = scS.historialPorUsuario(paciente.getId())
                 .stream()
-                .map(s -> modelMapper.map(s, SesionClinicaDTO.class))
+                .map(this::toDTO)
                 .toList();
         return ResponseEntity.ok(lista);
     }
@@ -74,7 +71,7 @@ public class SesionClinicaController {
     @PreAuthorize("hasRole('PACIENTE')")
     public ResponseEntity<SesionClinicaDTO> listarPorId(@PathVariable Long id, Authentication authentication) {
         SesionClinica s = scS.buscarDelPaciente(id, uS.usuarioActual(authentication));
-        return ResponseEntity.ok(modelMapper.map(s, SesionClinicaDTO.class));
+        return ResponseEntity.ok(toDTO(s));
     }
 
     @GetMapping("/derivaciones")
@@ -82,7 +79,7 @@ public class SesionClinicaController {
     public ResponseEntity<List<SesionClinicaDTO>> derivaciones(Authentication authentication) {
         List<SesionClinicaDTO> lista = scS.listarDerivacionesDePsicologo(uS.usuarioActual(authentication))
                 .stream()
-                .map(s -> modelMapper.map(s, SesionClinicaDTO.class))
+                .map(this::toDTO)
                 .toList();
         return ResponseEntity.ok(lista);
     }
@@ -92,5 +89,20 @@ public class SesionClinicaController {
     public ResponseEntity<Void> eliminar(@PathVariable Long id, Authentication authentication) {
         scS.delete(id, uS.usuarioActual(authentication));
         return ResponseEntity.noContent().build();
+    }
+
+    private SesionClinicaDTO toDTO(SesionClinica s) {
+        SesionClinicaDTO dto = new SesionClinicaDTO();
+        dto.setSesionClinicaId(s.getSesionClinicaId());
+        dto.setUsuarioId(s.getUsuario().getId());
+        dto.setNombrePaciente(uS.nombreCompleto(s.getUsuario()));
+        dto.setFechaHoraInicio(s.getFechaHoraInicio());
+        dto.setFechaHoraFin(s.getFechaHoraFin());
+        dto.setEmocionDetectada(s.getEmocionDetectada());
+        dto.setNivelUrgencia(s.getNivelUrgencia());
+        dto.setResumenIa(s.getResumenIa());
+        dto.setRequiereDerivacion(s.getRequiereDerivacion());
+        dto.setEstado(s.getEstado());
+        return dto;
     }
 }

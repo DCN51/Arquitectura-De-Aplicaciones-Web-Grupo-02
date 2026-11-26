@@ -205,6 +205,14 @@ public class UserServiceImplement implements pe.edu.upc.arquiwebgrupo02.services
         return tieneRol(usuario, "ADMINISTRADOR");
     }
 
+    @Override
+    public String nombreCompleto(Users usuario) {
+        if (usuario == null) {
+            return null;
+        }
+        return (usuario.getNombres() + " " + usuario.getApellidos()).trim();
+    }
+
     private boolean tieneRol(Users usuario, String rol) {
         if (usuario == null || usuario.getRole() == null || usuario.getRole().getRol() == null) {
             return false;

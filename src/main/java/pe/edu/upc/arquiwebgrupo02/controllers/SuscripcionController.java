@@ -1,7 +1,6 @@
 package pe.edu.upc.arquiwebgrupo02.controllers;
 
 import jakarta.validation.Valid;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -24,14 +23,11 @@ import java.util.List;
 @RequestMapping("/api/suscripciones")
 public class SuscripcionController {
     private final ISuscripcionService sS;
-    private final ModelMapper modelMapper;
     private final IUserService uS;
     private final ICatalogoPlanService cpS;
 
-    public SuscripcionController(ISuscripcionService sS, ModelMapper modelMapper,
-                                 IUserService uS, ICatalogoPlanService cpS) {
+    public SuscripcionController(ISuscripcionService sS, IUserService uS, ICatalogoPlanService cpS) {
         this.sS = sS;
-        this.modelMapper = modelMapper;
         this.uS = uS;
         this.cpS = cpS;
     }
@@ -44,7 +40,7 @@ public class SuscripcionController {
         Suscripcion s = armarSuscripcion(dto, uS.usuarioActual(authentication));
         sS.insert(s);
 
-        SuscripcionDTO responseDTO = modelMapper.map(s, SuscripcionDTO.class);
+        SuscripcionDTO responseDTO = toDTO(s);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -65,7 +61,7 @@ public class SuscripcionController {
         Suscripcion s = armarSuscripcion(dto, uS.usuarioActual(authentication));
         sS.cambiarPlan(s);
 
-        SuscripcionDTO responseDTO = modelMapper.map(s, SuscripcionDTO.class);
+        SuscripcionDTO responseDTO = toDTO(s);
         return ResponseEntity.ok(responseDTO);
     }
 
@@ -97,7 +93,7 @@ public class SuscripcionController {
     public ResponseEntity<List<SuscripcionDTO>> porVencer(@RequestParam(defaultValue = "7") int dias) {
         List<SuscripcionDTO> lista = sS.porVencer(dias)
                 .stream()
-                .map(s -> modelMapper.map(s, SuscripcionDTO.class))
+                .map(s -> toDTO(s))
                 .toList();
         return ResponseEntity.ok(lista);
     }
@@ -121,8 +117,23 @@ public class SuscripcionController {
     private List<SuscripcionDTO> historialDe(Long usuarioId) {
         return sS.historialPorUsuario(usuarioId)
                 .stream()
-                .map(s -> modelMapper.map(s, SuscripcionDTO.class))
+                .map(s -> toDTO(s))
                 .toList();
+    }
+
+    private SuscripcionDTO toDTO(Suscripcion s) {
+        SuscripcionDTO dto = new SuscripcionDTO();
+        dto.setSuscripcionId(s.getSuscripcionId());
+        dto.setFechaInicio(s.getFechaInicio());
+        dto.setFechaFin(s.getFechaFin());
+        dto.setEstadoSuscripcion(s.getEstadoSuscripcion());
+        dto.setMetodoPagoSuscripcion(s.getMetodoPagoSuscripcion());
+        dto.setReferenciaPagoSuscripcion(s.getReferenciaPagoSuscripcion());
+        dto.setUsuarioId(s.getUsuario().getId());
+        dto.setNombrePaciente(uS.nombreCompleto(s.getUsuario()));
+        dto.setCatalogoPlanId(s.getCatalogoPlan().getCatalogoPlanId());
+        dto.setNombrePlan(s.getCatalogoPlan().getNombreCatalogoPlan());
+        return dto;
     }
 
     private Suscripcion armarSuscripcion(SuscripcionDTO dto, Users usuario) {

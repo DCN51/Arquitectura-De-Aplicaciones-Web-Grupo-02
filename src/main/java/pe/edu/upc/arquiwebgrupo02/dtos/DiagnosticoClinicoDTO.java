@@ -32,6 +32,26 @@ public class DiagnosticoClinicoDTO {
 
     private LocalDateTime fechaValidacion;
 
+    private String nombrePaciente;
+
+    private String nombrePsicologo;
+
+    public String getNombrePaciente() {
+        return nombrePaciente;
+    }
+
+    public void setNombrePaciente(String nombrePaciente) {
+        this.nombrePaciente = nombrePaciente;
+    }
+
+    public String getNombrePsicologo() {
+        return nombrePsicologo;
+    }
+
+    public void setNombrePsicologo(String nombrePsicologo) {
+        this.nombrePsicologo = nombrePsicologo;
+    }
+
     public Long getDiagnosticoClinicoId() {
         return diagnosticoClinicoId;
     }

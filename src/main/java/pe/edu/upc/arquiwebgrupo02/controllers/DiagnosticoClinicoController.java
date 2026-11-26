@@ -119,6 +119,8 @@ public class DiagnosticoClinicoController {
         DiagnosticoClinicoDTO dto = new DiagnosticoClinicoDTO();
         dto.setDiagnosticoClinicoId(d.getDiagnosticoClinicoId());
         dto.setUsuarioId(d.getUsuario().getId());
+        dto.setNombrePaciente(uS.nombreCompleto(d.getUsuario()));
+        dto.setNombrePsicologo(uS.nombreCompleto(d.getValidacionPsicologo()));
         dto.setSesionClinicaId(d.getSesionClinica().getSesionClinicaId());
         dto.setFechaDiagnostico(d.getFechaDiagnostico());
         dto.setResultadoPrincipal(d.getResultadoPrincipal());

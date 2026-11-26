@@ -8,6 +8,16 @@ public class SesionClinicaDTO {
 
     private Long usuarioId;
 
+    private String nombrePaciente;
+
+    public String getNombrePaciente() {
+        return nombrePaciente;
+    }
+
+    public void setNombrePaciente(String nombrePaciente) {
+        this.nombrePaciente = nombrePaciente;
+    }
+
     // Fechas y estado NO se validan: los pone el servicio, el cliente no los envia
     private LocalDateTime fechaHoraInicio;
 

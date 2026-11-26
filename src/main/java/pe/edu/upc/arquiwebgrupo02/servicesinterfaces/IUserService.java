@@ -23,4 +23,5 @@ public interface IUserService {
     boolean esPaciente(Users usuario);
     boolean esPsicologo(Users usuario);
     boolean esAdministrador(Users usuario);
+    String nombreCompleto(Users usuario);
 }

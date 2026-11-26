@@ -33,7 +33,10 @@ public class RecommendedActivityDTO {
     private LocalDate completedDate;
     private String status;
     private String feedback;
+    private String nombrePaciente;
 
+    public String getNombrePaciente() { return nombrePaciente; }
+    public void setNombrePaciente(String nombrePaciente) { this.nombrePaciente = nombrePaciente; }
     public Integer getRecommendedActivityId() { return recommendedActivityId; }
     public void setRecommendedActivityId(Integer recommendedActivityId) { this.recommendedActivityId = recommendedActivityId; }
     public Long getUserId() { return userId; }

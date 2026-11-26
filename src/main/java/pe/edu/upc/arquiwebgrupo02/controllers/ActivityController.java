@@ -92,6 +92,7 @@ public class ActivityController {
         RecommendedActivityDTO response = new RecommendedActivityDTO();
         response.setRecommendedActivityId(recommendedActivity.getRecommendedActivityId());
         response.setUserId(recommendedActivity.getUser().getId());
+        response.setNombrePaciente(uS.nombreCompleto(recommendedActivity.getUser()));
         response.setDiagnosisId(recommendedActivity.getDiagnosticoClinico().getDiagnosticoClinicoId());
         response.setTitle(recommendedActivity.getTitle());
         response.setDescription(recommendedActivity.getDescription());
