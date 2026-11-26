@@ -27,6 +27,13 @@ public interface ISesionClinicaRepository extends JpaRepository<SesionClinica, L
             " order by fecha_hora_inicio desc", nativeQuery = true)
     public List<SesionClinica> buscarQueRequierenDerivacion();
 
+    @Query(value = "select * from sesiones_clinicas " +
+            " where requiere_derivacion = true" +
+            " and usuario_id in (select paciente_id from asignaciones_pacientes" +
+            " where psicologo_id = :psicologoId and activa = true)" +
+            " order by fecha_hora_inicio desc", nativeQuery = true)
+    public List<SesionClinica> buscarDerivacionesDePsicologo(@Param("psicologoId") Long psicologoId);
+
     // NUEVO: cantidad de sesiones que el usuario inicio en el mes actual (limite del plan)
     @Query(value = "select count(*) from sesiones_clinicas " +
             " where usuario_id = :usuarioId" +

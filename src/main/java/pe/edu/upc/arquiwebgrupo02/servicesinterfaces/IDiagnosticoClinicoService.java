@@ -13,7 +13,7 @@ public interface IDiagnosticoClinicoService {
     DiagnosticoClinico buscarParaUsuario(Long diagnosticoClinicoId, Users actual);
     List<DiagnosticoClinico> historialPorUsuario(Long usuarioId);
     List<DiagnosticoClinico> historialParaUsuario(Long usuarioId, Users actual);
-    List<DiagnosticoClinico> listarPendientesDeValidar();
+    List<DiagnosticoClinico> listarPendientesParaUsuario(Users actual);
     List<DiagnosticoClinico> listarValidadosPorPsicologo(Long psicologoId, Users actual);
     void delete(Long diagnosticoClinicoId);
 }

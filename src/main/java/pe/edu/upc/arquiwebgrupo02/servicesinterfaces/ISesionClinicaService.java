@@ -12,6 +12,6 @@ public interface ISesionClinicaService {
     Optional<SesionClinica> listId(Long sesionClinicaId);
     SesionClinica buscarDelPaciente(Long sesionClinicaId, Users paciente);
     List<SesionClinica> historialPorUsuario(Long usuarioId);
-    List<SesionClinica> listarQueRequierenDerivacion();
+    List<SesionClinica> listarDerivacionesDePsicologo(Users psicologo);
     void delete(Long sesionClinicaId, Users paciente);
 }

@@ -89,8 +89,8 @@ public class SesionClinicaServiceImplement implements ISesionClinicaService {
     }
 
     @Override
-    public List<SesionClinica> listarQueRequierenDerivacion() {
-        return scR.buscarQueRequierenDerivacion();
+    public List<SesionClinica> listarDerivacionesDePsicologo(Users psicologo) {
+        return scR.buscarDerivacionesDePsicologo(psicologo.getId());
     }
 
     @Override

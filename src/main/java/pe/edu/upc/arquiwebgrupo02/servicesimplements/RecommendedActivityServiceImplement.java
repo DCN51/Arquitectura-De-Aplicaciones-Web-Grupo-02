@@ -14,6 +14,7 @@ import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.exceptions.ResourceNotFoundException;
 import pe.edu.upc.arquiwebgrupo02.repositories.IDiagnosticoClinicoRepository;
 import pe.edu.upc.arquiwebgrupo02.repositories.IRecommendedActivityRepository;
+import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IAsignacionPacienteService;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IRecommendedActivityService;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService;
 
@@ -25,13 +26,16 @@ public class RecommendedActivityServiceImplement implements IRecommendedActivity
     private final IRecommendedActivityRepository recommendedActivityRepository;
     private final IDiagnosticoClinicoRepository diagnosticoClinicoRepository;
     private final IUserService uS;
+    private final IAsignacionPacienteService apS;
 
     public RecommendedActivityServiceImplement(IRecommendedActivityRepository recommendedActivityRepository,
                                                IDiagnosticoClinicoRepository diagnosticoClinicoRepository,
-                                               IUserService uS) {
+                                               IUserService uS,
+                                               IAsignacionPacienteService apS) {
         this.recommendedActivityRepository = recommendedActivityRepository;
         this.diagnosticoClinicoRepository = diagnosticoClinicoRepository;
         this.uS = uS;
+        this.apS = apS;
     }
 
     @Override
@@ -137,6 +141,9 @@ public class RecommendedActivityServiceImplement implements IRecommendedActivity
     }
 
     private void validarPacienteDelPsicologo(Users paciente, Users psicologo) {
+        if (!apS.estaAsignado(psicologo.getId(), paciente.getId())) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Este paciente no está asignado a ti");
+        }
     }
 
     private void requireOwner(Users usuario, RecommendedActivity actividad) {

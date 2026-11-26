@@ -79,8 +79,8 @@ public class SesionClinicaController {
 
     @GetMapping("/derivaciones")
     @PreAuthorize("hasRole('PSICOLOGO')")
-    public ResponseEntity<List<SesionClinicaDTO>> derivaciones() {
-        List<SesionClinicaDTO> lista = scS.listarQueRequierenDerivacion()
+    public ResponseEntity<List<SesionClinicaDTO>> derivaciones(Authentication authentication) {
+        List<SesionClinicaDTO> lista = scS.listarDerivacionesDePsicologo(uS.usuarioActual(authentication))
                 .stream()
                 .map(s -> modelMapper.map(s, SesionClinicaDTO.class))
                 .toList();

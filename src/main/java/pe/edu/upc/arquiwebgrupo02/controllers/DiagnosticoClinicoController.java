@@ -89,8 +89,8 @@ public class DiagnosticoClinicoController {
 
     @GetMapping("/pendientes")
     @PreAuthorize("hasAnyRole('PSICOLOGO','ADMINISTRADOR')")
-    public ResponseEntity<List<DiagnosticoClinicoDTO>> pendientes() {
-        List<DiagnosticoClinicoDTO> lista = dcS.listarPendientesDeValidar()
+    public ResponseEntity<List<DiagnosticoClinicoDTO>> pendientes(Authentication authentication) {
+        List<DiagnosticoClinicoDTO> lista = dcS.listarPendientesParaUsuario(uS.usuarioActual(authentication))
                 .stream()
                 .map(this::toDTO)
                 .toList();
