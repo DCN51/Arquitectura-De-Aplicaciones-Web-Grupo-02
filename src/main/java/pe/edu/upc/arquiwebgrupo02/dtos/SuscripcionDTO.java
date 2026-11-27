@@ -20,11 +20,30 @@ public class SuscripcionDTO {
 
     private String referenciaPagoSuscripcion;
 
-    @NotNull(message = "El id del usuario es obligatorio")
     private Long usuarioId;
 
     @NotNull(message = "El id del plan es obligatorio")
     private Long catalogoPlanId;
+
+    private String nombrePaciente;
+
+    private String nombrePlan;
+
+    public String getNombrePaciente() {
+        return nombrePaciente;
+    }
+
+    public void setNombrePaciente(String nombrePaciente) {
+        this.nombrePaciente = nombrePaciente;
+    }
+
+    public String getNombrePlan() {
+        return nombrePlan;
+    }
+
+    public void setNombrePlan(String nombrePlan) {
+        this.nombrePlan = nombrePlan;
+    }
 
     public Long getSuscripcionId() {
         return suscripcionId;

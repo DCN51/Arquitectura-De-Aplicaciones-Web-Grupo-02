@@ -105,8 +105,8 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
     public void asignarPlanFree(Users usuario) {
         CatalogoPlan free = cpR.buscarPlanFree();
         if (free == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "No existe un plan 'free' activo en el catálogo");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "No se puede registrar al paciente: no existe un plan 'free' activo en el catálogo");
         }
         Suscripcion s = new Suscripcion();
         s.setUsuario(usuario);
@@ -124,8 +124,8 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
         }
         CatalogoPlan free = cpR.buscarPlanFree();
         if (free == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
-                    "No existe un plan 'free' activo en el catálogo");
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "No tienes una suscripción activa y no hay un plan 'free' disponible. Contrata un plan para continuar");
         }
         return free;
     }
@@ -150,6 +150,13 @@ public class SuscripcionServiceImplement implements ISuscripcionService {
             s.setMetodoPagoSuscripcion(null);
             s.setReferenciaPagoSuscripcion(null);
         } else {
+            if (s.getMetodoPagoSuscripcion() == null || s.getMetodoPagoSuscripcion().isBlank()
+                    || s.getReferenciaPagoSuscripcion() == null || s.getReferenciaPagoSuscripcion().isBlank()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "El método y la referencia de pago son obligatorios para planes de pago");
+            }
+            s.setMetodoPagoSuscripcion(s.getMetodoPagoSuscripcion().trim());
+            s.setReferenciaPagoSuscripcion(s.getReferenciaPagoSuscripcion().trim());
             // 3b. Plan pagado: vence en un mes
             s.setFechaFin(LocalDate.now().plusMonths(1));
         }

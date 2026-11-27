@@ -1,11 +1,14 @@
 package pe.edu.upc.arquiwebgrupo02.servicesimplements;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import pe.edu.upc.arquiwebgrupo02.dtos.CreateUserRequestDTO;
+import pe.edu.upc.arquiwebgrupo02.dtos.UserUpdateRequestDTO;
+import pe.edu.upc.arquiwebgrupo02.exceptions.ResourceNotFoundException;
 import pe.edu.upc.arquiwebgrupo02.entities.Role;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.repositories.IRoleRepository;
@@ -134,5 +137,87 @@ public class UserServiceImplement implements pe.edu.upc.arquiwebgrupo02.services
     @Override
     public Optional<Users> listId(Long id) {
         return usuarioRepository.findById(id);
+    }
+
+    @Override
+    public Users usuarioActual(Authentication authentication) {
+        if (authentication == null || isBlank(authentication.getName())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Debes iniciar sesión");
+        }
+        return usuarioRepository.findByUsername(authentication.getName())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "El usuario de la sesión ya no existe"));
+    }
+
+    @Override
+    public Users buscarPorId(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No existe el usuario con el id: " + id));
+    }
+
+    @Override
+    public List<Users> listarPorRolYEstado(Long roleId, String estadoCuenta) {
+        return usuarioRepository.buscarPorRolYEstado(roleId, isBlank(estadoCuenta) ? null : estadoCuenta.trim());
+    }
+
+    @Override
+    @Transactional
+    public Users actualizar(Users usuario, UserUpdateRequestDTO datos) {
+        if (!isBlank(datos.getFirstName())) usuario.setNombres(datos.getFirstName().trim());
+        if (!isBlank(datos.getLastName())) usuario.setApellidos(datos.getLastName().trim());
+        if (!isBlank(datos.getEmail())) {
+            String email = datos.getEmail().trim().toLowerCase(Locale.ROOT);
+            if (usuarioRepository.existsByCorreoElectronicoAndIdNot(email, usuario.getId())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "El correo electrónico ya está registrado");
+            }
+            usuario.setCorreoElectronico(email);
+        }
+        if (!isBlank(datos.getPassword())) usuario.setPassword(passwordEncoder.encode(datos.getPassword()));
+        if (!isBlank(datos.getPhone())) usuario.setTelefono(datos.getPhone().trim());
+        if (datos.getBirthDate() != null) usuario.setFechaNacimiento(datos.getBirthDate());
+        if (!isBlank(datos.getGender())) usuario.setGenero(datos.getGender().trim());
+        return usuarioRepository.save(usuario);
+    }
+
+    @Override
+    @Transactional
+    public Users desactivar(Long id) {
+        Users usuario = buscarPorId(id);
+        if (!usuario.isEnabled()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "La cuenta ya está inactiva");
+        }
+        usuario.setEstadoCuenta("INACTIVO");
+        return usuarioRepository.save(usuario);
+    }
+
+    @Override
+    public boolean esPaciente(Users usuario) {
+        return tieneRol(usuario, "PACIENTE");
+    }
+
+    @Override
+    public boolean esPsicologo(Users usuario) {
+        return tieneRol(usuario, "PSICOLOGO");
+    }
+
+    @Override
+    public boolean esAdministrador(Users usuario) {
+        return tieneRol(usuario, "ADMINISTRADOR");
+    }
+
+    @Override
+    public String nombreCompleto(Users usuario) {
+        if (usuario == null) {
+            return null;
+        }
+        return (usuario.getNombres() + " " + usuario.getApellidos()).trim();
+    }
+
+    private boolean tieneRol(Users usuario, String rol) {
+        if (usuario == null || usuario.getRole() == null || usuario.getRole().getRol() == null) {
+            return false;
+        }
+        String nombre = usuario.getRole().getRol().toUpperCase(Locale.ROOT);
+        return nombre.equals(rol) || nombre.equals("ROLE_" + rol);
     }
 }

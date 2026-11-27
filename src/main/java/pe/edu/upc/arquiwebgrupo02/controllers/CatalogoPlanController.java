@@ -113,6 +113,9 @@ public class CatalogoPlanController {
 
     // Busca el plan o responde 404 si no existe
     private CatalogoPlan buscarPlan(Long id) {
+        if (id == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El id del plan es obligatorio");
+        }
         return cpS.listId(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(

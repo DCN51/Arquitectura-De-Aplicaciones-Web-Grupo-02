@@ -60,7 +60,18 @@ public class Users implements Serializable {
     @Column(name = "verificationStatus", nullable = false, length = 20)
     private String estadoVerificacion = "PENDIENTE";
 
+    @Column(name = "maxPacientes")
+    private Integer maxPacientes;
+
     public Users() {
+    }
+
+    public Integer getMaxPacientes() {
+        return maxPacientes;
+    }
+
+    public void setMaxPacientes(Integer maxPacientes) {
+        this.maxPacientes = maxPacientes;
     }
 
     @PrePersist
