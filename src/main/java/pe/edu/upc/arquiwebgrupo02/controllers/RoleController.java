@@ -28,13 +28,13 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-    // Listar roles: público, porque lo usa la pantalla de Registro
+    // HU002 - Listar roles: público, porque lo usa la pantalla de Registro
     @GetMapping
     public List<RoleDTO> list() {
         return roleService.list().stream().map(this::toDTO).toList();
     }
 
-    // Registrar rol
+    // HU043 - Registrar rol
     @PostMapping
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<RoleDTO> registrar(@Valid @RequestBody RoleDTO dto) {
@@ -51,7 +51,7 @@ public class RoleController {
         return ResponseEntity.created(location).body(toDTO(creado));
     }
 
-    // Buscar rol por id
+    // Apoyo para HU044 - buscar el rol a editar
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<RoleDTO> buscarPorId(@PathVariable Long id) {
@@ -62,20 +62,16 @@ public class RoleController {
         return ResponseEntity.ok(toDTO(role));
     }
 
-    // Actualizar rol
+    // HU044 - Actualizar rol
     @PutMapping
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<RoleDTO> actualizar(@Valid @RequestBody RoleDTO dto) {
-        Role existente = roleService.listId(dto.getRoleId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("No existe un rol con el id: " + dto.getRoleId())
-                );
-        existente.setRol(dto.getName());
-        Role actualizado = roleService.update(existente);
+        // El service valida (rol del sistema, nombre repetido) antes de cambiar el nombre
+        Role actualizado = roleService.update(dto.getRoleId(), dto.getName());
         return ResponseEntity.ok(toDTO(actualizado));
     }
 
-    // Eliminar rol
+    // HU045 - Eliminar rol
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     public ResponseEntity<Void> eliminar(@PathVariable Long id) {

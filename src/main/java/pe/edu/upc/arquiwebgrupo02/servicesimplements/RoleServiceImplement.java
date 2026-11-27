@@ -45,15 +45,15 @@ public class RoleServiceImplement implements IRoleService {
     }
 
     @Override
-    public Role update(Role role) {
-        Role existente = roleRepository.findById(role.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("No existe un rol con el id: " + role.getId()));
+    public Role update(Long id, String nombre) {
+        Role existente = roleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No existe un rol con el id: " + id));
 
         if (ROLES_DEL_SISTEMA.contains(existente.getRol())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Los roles del sistema no se pueden modificar");
         }
 
-        String nuevoNombre = normalizar(role.getRol());
+        String nuevoNombre = normalizar(nombre);
         if (!nuevoNombre.equalsIgnoreCase(existente.getRol())
                 && roleRepository.existsByRolIgnoreCase(nuevoNombre)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Ya existe un rol con ese nombre");

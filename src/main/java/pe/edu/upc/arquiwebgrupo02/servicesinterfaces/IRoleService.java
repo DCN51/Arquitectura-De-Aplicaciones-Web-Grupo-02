@@ -11,7 +11,7 @@ public interface IRoleService {
 
     Role insert(Role role);
 
-    Role update(Role role);
+    Role update(Long id, String nombre);
 
     void delete(Long id);
 }

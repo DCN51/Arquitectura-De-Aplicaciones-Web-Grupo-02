@@ -61,7 +61,7 @@ public class ActivityController {
     }
 
     @GetMapping("/users/{userId}")
-    @PreAuthorize("hasRole('PACIENTE')")
+    @PreAuthorize("hasAnyRole('PACIENTE','PSICOLOGO')")   // el psicólogo lista para editar y eliminar (HUF23, HUF25)
     public List<RecommendedActivityDTO> listForUser(
             @PathVariable Long userId,
             @RequestParam(required = false) String status,
