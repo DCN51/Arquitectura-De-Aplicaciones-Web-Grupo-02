@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface IDiagnosticoClinicoService {
-    DiagnosticoClinico registrar(DiagnosticoClinico d, Users paciente);
+    DiagnosticoClinico registrar(DiagnosticoClinico d);
     DiagnosticoClinico validar(Long diagnosticoClinicoId, Users psicologo);
     Optional<DiagnosticoClinico> listId(Long diagnosticoClinicoId);
-    DiagnosticoClinico buscarParaUsuario(Long diagnosticoClinicoId, Users actual);
     List<DiagnosticoClinico> historialPorUsuario(Long usuarioId);
-    List<DiagnosticoClinico> historialParaUsuario(Long usuarioId, Users actual);
-    List<DiagnosticoClinico> listarPendientesParaUsuario(Users actual);
-    List<DiagnosticoClinico> listarValidadosPorPsicologo(Long psicologoId, Users actual);
+    List<DiagnosticoClinico> listarPendientesDeValidar();
+    List<DiagnosticoClinico> listarValidadosPorPsicologo(Long psicologoId);
     void delete(Long diagnosticoClinicoId);
 }

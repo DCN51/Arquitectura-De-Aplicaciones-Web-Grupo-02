@@ -1,14 +1,15 @@
 package pe.edu.upc.arquiwebgrupo02.controllers;
 
 import jakarta.validation.Valid;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import pe.edu.upc.arquiwebgrupo02.dtos.SesionClinicaDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.SesionClinica;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
+import pe.edu.upc.arquiwebgrupo02.exceptions.ResourceNotFoundException;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.ISesionClinicaService;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService;
 
@@ -20,17 +21,28 @@ import java.util.List;
 public class SesionClinicaController {
     private final ISesionClinicaService scS;
     private final IUserService uS;
+    private final ModelMapper modelMapper;
 
-    public SesionClinicaController(ISesionClinicaService scS, IUserService uS) {
+    public SesionClinicaController(ISesionClinicaService scS, IUserService uS, ModelMapper modelMapper) {
         this.scS = scS;
         this.uS = uS;
+        this.modelMapper = modelMapper;
     }
 
+    // HU05 - Iniciar una sesion con la IA (solo se envia el usuarioId)
     @PostMapping
     @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<SesionClinicaDTO> iniciar(Authentication authentication) {
-        Users paciente = uS.usuarioActual(authentication);
-        SesionClinica creada = scS.iniciar(paciente);
+    public ResponseEntity<SesionClinicaDTO> iniciar(@Valid @RequestBody SesionClinicaDTO dto) {
+        Users u = uS.listId(dto.getUsuarioId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No existe el usuario con el id: " + dto.getUsuarioId()
+                        )
+                );
+
+        SesionClinica s = new SesionClinica();
+        s.setUsuario(u);
+        SesionClinica creada = scS.iniciar(s);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -40,70 +52,69 @@ public class SesionClinicaController {
 
         return ResponseEntity
                 .created(location)
-                .body(toDTO(creada));
+                .body(modelMapper.map(creada, SesionClinicaDTO.class));
     }
 
+    // HU05 y HU14 - Finalizar la sesion con el resultado de la IA
     @PutMapping("/{id}/finalizar")
     @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<SesionClinicaDTO> finalizar(@PathVariable Long id, @Valid @RequestBody SesionClinicaDTO dto,
-                                                      Authentication authentication) {
+    public ResponseEntity<SesionClinicaDTO> finalizar(@PathVariable Long id, @RequestBody SesionClinicaDTO dto) {
         SesionClinica datos = new SesionClinica();
         datos.setEmocionDetectada(dto.getEmocionDetectada());
         datos.setNivelUrgencia(dto.getNivelUrgencia());
         datos.setResumenIa(dto.getResumenIa());
         datos.setRequiereDerivacion(dto.getRequiereDerivacion());
 
-        SesionClinica finalizada = scS.finalizar(id, datos, uS.usuarioActual(authentication));
-        return ResponseEntity.ok(toDTO(finalizada));
+        SesionClinica finalizada = scS.finalizar(id, datos);
+        return ResponseEntity.ok(modelMapper.map(finalizada, SesionClinicaDTO.class));
     }
 
-    @GetMapping("/mis-sesiones")
-    @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<List<SesionClinicaDTO>> misSesiones(Authentication authentication) {
-        Users paciente = uS.usuarioActual(authentication);
-        List<SesionClinicaDTO> lista = scS.historialPorUsuario(paciente.getId())
-                .stream()
-                .map(this::toDTO)
-                .toList();
-        return ResponseEntity.ok(lista);
-    }
-
+    // Ver una sesion
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<SesionClinicaDTO> listarPorId(@PathVariable Long id, Authentication authentication) {
-        SesionClinica s = scS.buscarDelPaciente(id, uS.usuarioActual(authentication));
-        return ResponseEntity.ok(toDTO(s));
+    public ResponseEntity<SesionClinicaDTO> listarPorId(@PathVariable Long id) {
+        SesionClinica s = scS.listId(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No existe la sesión con el id: " + id
+                        )
+                );
+        return ResponseEntity.ok(modelMapper.map(s, SesionClinicaDTO.class));
     }
 
-    @GetMapping("/derivaciones")
-    @PreAuthorize("hasRole('PSICOLOGO')")
-    public ResponseEntity<List<SesionClinicaDTO>> derivaciones(Authentication authentication) {
-        List<SesionClinicaDTO> lista = scS.listarDerivacionesDePsicologo(uS.usuarioActual(authentication))
+    // Historial de sesiones del usuario
+    @GetMapping("/usuario/{usuarioId}")
+    @PreAuthorize("hasRole('PACIENTE')")
+    public ResponseEntity<List<SesionClinicaDTO>> historial(@PathVariable Long usuarioId) {
+        uS.listId(usuarioId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No existe el usuario con el id: " + usuarioId
+                        )
+                );
+        List<SesionClinicaDTO> lista = scS.historialPorUsuario(usuarioId)
                 .stream()
-                .map(this::toDTO)
+                .map(s -> modelMapper.map(s, SesionClinicaDTO.class))
                 .toList();
         return ResponseEntity.ok(lista);
     }
 
-    @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id, Authentication authentication) {
-        scS.delete(id, uS.usuarioActual(authentication));
-        return ResponseEntity.noContent().build();
+    // HU11 - Sesiones que requieren derivacion (solo psicologos y admin)
+    @GetMapping("/derivaciones")
+    @PreAuthorize("hasRole('PSICOLOGO')")
+    public ResponseEntity<List<SesionClinicaDTO>> derivaciones() {
+        List<SesionClinicaDTO> lista = scS.listarQueRequierenDerivacion()
+                .stream()
+                .map(s -> modelMapper.map(s, SesionClinicaDTO.class))
+                .toList();
+        return ResponseEntity.ok(lista);
     }
 
-    private SesionClinicaDTO toDTO(SesionClinica s) {
-        SesionClinicaDTO dto = new SesionClinicaDTO();
-        dto.setSesionClinicaId(s.getSesionClinicaId());
-        dto.setUsuarioId(s.getUsuario().getId());
-        dto.setNombrePaciente(uS.nombreCompleto(s.getUsuario()));
-        dto.setFechaHoraInicio(s.getFechaHoraInicio());
-        dto.setFechaHoraFin(s.getFechaHoraFin());
-        dto.setEmocionDetectada(s.getEmocionDetectada());
-        dto.setNivelUrgencia(s.getNivelUrgencia());
-        dto.setResumenIa(s.getResumenIa());
-        dto.setRequiereDerivacion(s.getRequiereDerivacion());
-        dto.setEstado(s.getEstado());
-        return dto;
+    // HU38 - Eliminar una sesion del historial
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('PACIENTE')")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        scS.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

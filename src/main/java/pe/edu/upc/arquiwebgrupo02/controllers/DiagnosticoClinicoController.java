@@ -10,6 +10,8 @@ import pe.edu.upc.arquiwebgrupo02.dtos.DiagnosticoClinicoDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.DiagnosticoClinico;
 import pe.edu.upc.arquiwebgrupo02.entities.SesionClinica;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
+import pe.edu.upc.arquiwebgrupo02.exceptions.ResourceNotFoundException;
+import pe.edu.upc.arquiwebgrupo02.repositories.IUsuarioRepository;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IDiagnosticoClinicoService;
 import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService;
 
@@ -21,16 +23,17 @@ import java.util.List;
 public class DiagnosticoClinicoController {
     private final IDiagnosticoClinicoService dcS;
     private final IUserService uS;
+    private final IUsuarioRepository uR;
 
-    public DiagnosticoClinicoController(IDiagnosticoClinicoService dcS, IUserService uS) {
+    public DiagnosticoClinicoController(IDiagnosticoClinicoService dcS, IUserService uS, IUsuarioRepository uR) {
         this.dcS = dcS;
         this.uS = uS;
+        this.uR = uR;
     }
 
     @PostMapping
     @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<DiagnosticoClinicoDTO> registrar(@Valid @RequestBody DiagnosticoClinicoDTO dto,
-                                                           Authentication authentication) {
+    public ResponseEntity<DiagnosticoClinicoDTO> registrar(@Valid @RequestBody DiagnosticoClinicoDTO dto) {
         SesionClinica sesion = new SesionClinica();
         sesion.setSesionClinicaId(dto.getSesionClinicaId());
 
@@ -41,7 +44,7 @@ public class DiagnosticoClinicoController {
         d.setNivelRiesgo(dto.getNivelRiesgo().trim());
         d.setRecomendacionGeneral(dto.getRecomendacionGeneral());
 
-        DiagnosticoClinico creado = dcS.registrar(d, uS.usuarioActual(authentication));
+        DiagnosticoClinico creado = dcS.registrar(d);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -55,32 +58,37 @@ public class DiagnosticoClinicoController {
     @PutMapping("/{id}/validar")
     @PreAuthorize("hasRole('PSICOLOGO')")
     public ResponseEntity<DiagnosticoClinicoDTO> validar(@PathVariable Long id, Authentication authentication) {
-        Users psicologo = uS.usuarioActual(authentication);
+        Users psicologo = uR.findByUsername(authentication.getName())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No existe el usuario: " + authentication.getName()
+                        )
+                );
         return ResponseEntity.ok(toDTO(dcS.validar(id, psicologo)));
-    }
-
-    @GetMapping("/mis-diagnosticos")
-    @PreAuthorize("hasRole('PACIENTE')")
-    public ResponseEntity<List<DiagnosticoClinicoDTO>> misDiagnosticos(Authentication authentication) {
-        Users paciente = uS.usuarioActual(authentication);
-        List<DiagnosticoClinicoDTO> lista = dcS.historialPorUsuario(paciente.getId())
-                .stream()
-                .map(this::toDTO)
-                .toList();
-        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('PACIENTE','PSICOLOGO')")
-    public ResponseEntity<DiagnosticoClinicoDTO> listarPorId(@PathVariable Long id, Authentication authentication) {
-        return ResponseEntity.ok(toDTO(dcS.buscarParaUsuario(id, uS.usuarioActual(authentication))));
+    public ResponseEntity<DiagnosticoClinicoDTO> listarPorId(@PathVariable Long id) {
+        DiagnosticoClinico d = dcS.listId(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No existe el diagnóstico con el id: " + id
+                        )
+                );
+        return ResponseEntity.ok(toDTO(d));
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    @PreAuthorize("hasAnyRole('PSICOLOGO','ADMINISTRADOR')")
-    public ResponseEntity<List<DiagnosticoClinicoDTO>> historial(@PathVariable Long usuarioId,
-                                                                 Authentication authentication) {
-        List<DiagnosticoClinicoDTO> lista = dcS.historialParaUsuario(usuarioId, uS.usuarioActual(authentication))
+    @PreAuthorize("hasAnyRole('PACIENTE','PSICOLOGO')")
+    public ResponseEntity<List<DiagnosticoClinicoDTO>> historial(@PathVariable Long usuarioId) {
+        uS.listId(usuarioId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "No existe el usuario con el id: " + usuarioId
+                        )
+                );
+        List<DiagnosticoClinicoDTO> lista = dcS.historialPorUsuario(usuarioId)
                 .stream()
                 .map(this::toDTO)
                 .toList();
@@ -89,8 +97,8 @@ public class DiagnosticoClinicoController {
 
     @GetMapping("/pendientes")
     @PreAuthorize("hasAnyRole('PSICOLOGO','ADMINISTRADOR')")
-    public ResponseEntity<List<DiagnosticoClinicoDTO>> pendientes(Authentication authentication) {
-        List<DiagnosticoClinicoDTO> lista = dcS.listarPendientesParaUsuario(uS.usuarioActual(authentication))
+    public ResponseEntity<List<DiagnosticoClinicoDTO>> pendientes() {
+        List<DiagnosticoClinicoDTO> lista = dcS.listarPendientesDeValidar()
                 .stream()
                 .map(this::toDTO)
                 .toList();
@@ -99,9 +107,8 @@ public class DiagnosticoClinicoController {
 
     @GetMapping("/psicologo/{psicologoId}")
     @PreAuthorize("hasAnyRole('PSICOLOGO','ADMINISTRADOR')")
-    public ResponseEntity<List<DiagnosticoClinicoDTO>> validadosPorPsicologo(@PathVariable Long psicologoId,
-                                                                             Authentication authentication) {
-        List<DiagnosticoClinicoDTO> lista = dcS.listarValidadosPorPsicologo(psicologoId, uS.usuarioActual(authentication))
+    public ResponseEntity<List<DiagnosticoClinicoDTO>> validadosPorPsicologo(@PathVariable Long psicologoId) {
+        List<DiagnosticoClinicoDTO> lista = dcS.listarValidadosPorPsicologo(psicologoId)
                 .stream()
                 .map(this::toDTO)
                 .toList();
@@ -119,8 +126,6 @@ public class DiagnosticoClinicoController {
         DiagnosticoClinicoDTO dto = new DiagnosticoClinicoDTO();
         dto.setDiagnosticoClinicoId(d.getDiagnosticoClinicoId());
         dto.setUsuarioId(d.getUsuario().getId());
-        dto.setNombrePaciente(uS.nombreCompleto(d.getUsuario()));
-        dto.setNombrePsicologo(uS.nombreCompleto(d.getValidacionPsicologo()));
         dto.setSesionClinicaId(d.getSesionClinica().getSesionClinicaId());
         dto.setFechaDiagnostico(d.getFechaDiagnostico());
         dto.setResultadoPrincipal(d.getResultadoPrincipal());

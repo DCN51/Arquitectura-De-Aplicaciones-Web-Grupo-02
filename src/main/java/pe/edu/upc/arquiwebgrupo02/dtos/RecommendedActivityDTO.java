@@ -9,34 +9,31 @@ import java.time.LocalDate;
 public class RecommendedActivityDTO {
     private Integer recommendedActivityId;
 
-    @NotNull(message = "El id del paciente es obligatorio")
-    @Positive(message = "El id del paciente debe ser mayor que 0")
+    @NotNull
+    @Positive
     private Long userId;
 
-    @NotNull(message = "El id del diagnóstico es obligatorio")
-    @Positive(message = "El id del diagnóstico debe ser mayor que 0")
+    @NotNull
+    @Positive
     private Long diagnosisId;
 
-    @NotBlank(message = "El título es obligatorio")
-    @Size(max = 100, message = "El título no puede tener más de 100 caracteres")
+    @NotBlank
+    @Size(max = 100)
     private String title;
 
-    @NotBlank(message = "La descripción es obligatoria")
-    @Size(max = 255, message = "La descripción no puede tener más de 255 caracteres")
+    @NotBlank
+    @Size(max = 255)
     private String description;
 
-    @NotBlank(message = "El tipo es obligatorio")
-    @Size(max = 50, message = "El tipo no puede tener más de 50 caracteres")
+    @NotBlank
+    @Size(max = 50)
     private String type;
 
     private LocalDate assignedDate;
     private LocalDate completedDate;
     private String status;
     private String feedback;
-    private String nombrePaciente;
 
-    public String getNombrePaciente() { return nombrePaciente; }
-    public void setNombrePaciente(String nombrePaciente) { this.nombrePaciente = nombrePaciente; }
     public Integer getRecommendedActivityId() { return recommendedActivityId; }
     public void setRecommendedActivityId(Integer recommendedActivityId) { this.recommendedActivityId = recommendedActivityId; }
     public Long getUserId() { return userId; }

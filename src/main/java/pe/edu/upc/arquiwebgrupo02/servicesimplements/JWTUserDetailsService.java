@@ -9,7 +9,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
 import pe.edu.upc.arquiwebgrupo02.repositories.IUsuarioRepository;
-import pe.edu.upc.arquiwebgrupo02.securities.RolAuthority;
+
+import java.util.Locale;
 
 @Service
 public class JWTUserDetailsService implements UserDetailsService {
@@ -32,7 +33,7 @@ public class JWTUserDetailsService implements UserDetailsService {
                 );
 
         GrantedAuthority authority = new SimpleGrantedAuthority(
-                RolAuthority.normalizar(user.getRole().getRol())
+                user.getRole().getRol().toUpperCase(Locale.ROOT)
         );
 
         return User.builder()

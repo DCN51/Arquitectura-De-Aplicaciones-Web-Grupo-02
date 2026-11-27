@@ -1,9 +1,17 @@
 package pe.edu.upc.arquiwebgrupo02.servicesinterfaces;
 
 import java.util.List;
+import java.util.Optional;
 import pe.edu.upc.arquiwebgrupo02.entities.Role;
 
 public interface IRoleService {
     List<Role> list();
-    List<Role> listarParaRegistro();
+
+    Optional<Role> listId(Long id);
+
+    Role insert(Role role);
+
+    Role update(Role role);
+
+    void delete(Long id);
 }

@@ -125,15 +125,14 @@ public class SecurityConfig {
                         // Inicio de sesión público
                         .requestMatchers(
                                 HttpMethod.POST, "/login" ).permitAll()
-                        // Inicio de sesión público
-                        .requestMatchers(
-                                HttpMethod.POST, "/login" ).permitAll()
+
 
                         // Registro público (aún no tiene token)
                         .requestMatchers(
                                 HttpMethod.POST, "/api/usuarios" ).permitAll()
                         .requestMatchers(
-                                HttpMethod.GET, "/api/roles/registro" ).permitAll()
+                                HttpMethod.GET, "/api/roles" ).permitAll()
+                        
                         // Catálogo de planes
                         //.requestMatchers( HttpMethod.GET, "/api/CatalogoPlan" ).permitAll()
                         //.requestMatchers( HttpMethod.POST, "/api/CatalogoPlan" ).permitAll()

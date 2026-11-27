@@ -22,9 +22,4 @@ public interface IUsuarioRepository extends JpaRepository<Users, Long> {
     List<Users> buscarPorRolYEstado(
             @Param("roleId") Long roleId,
             @Param("estadoCuenta") String estadoCuenta);
-
-    @Query(value = "select u.* from users u inner join roles r on u.idrol = r.id\n" +
-            " where upper(r.rol) in ('PSICOLOGO', 'ROLE_PSICOLOGO')\n" +
-            " order by u.apellidos, u.nombres", nativeQuery = true)
-    List<Users> listarPsicologos();
 }

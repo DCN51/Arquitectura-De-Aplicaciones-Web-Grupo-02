@@ -1,6 +1,5 @@
 package pe.edu.upc.arquiwebgrupo02.controllers;
 
-import jakarta.validation.Valid;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -13,10 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 import pe.edu.upc.arquiwebgrupo02.dtos.LoginRequestDTO;
 import pe.edu.upc.arquiwebgrupo02.dtos.LoginResponseDTO;
 import pe.edu.upc.arquiwebgrupo02.entities.Users;
+import pe.edu.upc.arquiwebgrupo02.repositories.IUsuarioRepository;
 import pe.edu.upc.arquiwebgrupo02.securities.JwtTokenService;
-import pe.edu.upc.arquiwebgrupo02.servicesinterfaces.IUserService;
-
-import java.util.Locale;
 
 @RestController
 @RequestMapping("/login")
@@ -25,21 +22,21 @@ public class LoginController {
 
     private final JwtTokenService jwtTokenService;
 
-    private final IUserService uS;
+    private final IUsuarioRepository usuarioRepository;
 
     public LoginController(
             AuthenticationManager authenticationManager,
             JwtTokenService jwtTokenService,
-            IUserService uS) {
+            IUsuarioRepository usuarioRepository) {
 
         this.authenticationManager = authenticationManager;
         this.jwtTokenService = jwtTokenService;
-        this.uS = uS;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @PostMapping
     public ResponseEntity<LoginResponseDTO> login(
-            @Valid @RequestBody LoginRequestDTO request) {
+            @RequestBody LoginRequestDTO request) {
 
         Authentication authentication =
                 authenticationManager.authenticate(
@@ -55,16 +52,20 @@ public class LoginController {
         String token =
                 jwtTokenService.generateToken(userDetails);
 
-        Users usuario = uS.usuarioActual(authentication);
+        // Id del usuario que inicia sesión, para que el front no lo pida
+        Long userId = usuarioRepository.findByUsername(userDetails.getUsername())
+                .map(Users::getId)
+                .orElse(null);
 
         return ResponseEntity.ok(
                 new LoginResponseDTO(
                         token,
-                        usuario.getId(),
                         userDetails.getUsername(),
-                        usuario.getRole().getRol().toUpperCase(Locale.ROOT),
-                        usuario.getNombres(),
-                        usuario.getApellidos()
+                        userDetails.getAuthorities().stream()
+                                .map(authority -> authority.getAuthority())
+                                .findFirst()
+                                .orElseThrow(),
+                        userId
                 )
         );
     }

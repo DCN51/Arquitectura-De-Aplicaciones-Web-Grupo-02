@@ -84,7 +84,7 @@ public class CatalogoPlanController {
 
     // Apoyo para US02 - obtener el plan a editar
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('PACIENTE','ADMINISTRADOR')")
     public ResponseEntity<CatalogoPlanDTO> buscarPorId(@PathVariable Long id) {
         return ResponseEntity.ok(modelMapper.map(buscarPlan(id), CatalogoPlanDTO.class));
     }
@@ -113,9 +113,6 @@ public class CatalogoPlanController {
 
     // Busca el plan o responde 404 si no existe
     private CatalogoPlan buscarPlan(Long id) {
-        if (id == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El id del plan es obligatorio");
-        }
         return cpS.listId(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(

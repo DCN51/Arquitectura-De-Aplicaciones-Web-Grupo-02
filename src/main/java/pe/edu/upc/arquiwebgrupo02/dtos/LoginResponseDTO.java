@@ -3,31 +3,21 @@ package pe.edu.upc.arquiwebgrupo02.dtos;
 public class LoginResponseDTO {
     private String token;
 
-    private Long userId;
-
     private String username;
 
     private String rol;
 
-    private String nombres;
+    private Long userId;
 
-    private String apellidos;
-
-    public LoginResponseDTO(String token, Long userId, String username, String rol, String nombres, String apellidos) {
+    public LoginResponseDTO(String token, String username, String rol, Long userId) {
         this.token = token;
-        this.userId = userId;
         this.username = username;
         this.rol = rol;
-        this.nombres = nombres;
-        this.apellidos = apellidos;
+        this.userId = userId;
     }
 
     public String getToken() {
         return token;
-    }
-
-    public Long getUserId() {
-        return userId;
     }
 
     public String getUsername() {
@@ -38,11 +28,7 @@ public class LoginResponseDTO {
         return rol;
     }
 
-    public String getNombres() {
-        return nombres;
-    }
-
-    public String getApellidos() {
-        return apellidos;
+    public Long getUserId() {
+        return userId;
     }
 }

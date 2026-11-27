@@ -1,6 +1,5 @@
 package pe.edu.upc.arquiwebgrupo02.dtos;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 
@@ -17,7 +16,6 @@ public class CatalogoPlanDTO {
     private double precioMensualCatalogoPlan;
 
     // -1 = sesiones ilimitadas
-    @Min(value = -1, message = "El límite de sesiones debe ser -1 (ilimitadas) o un número mayor que 0")
     private int limiteSesionesMes;
 
     private boolean incluyeDiagnostico;

@@ -20,13 +20,6 @@ public interface IDiagnosticoClinicoRepository extends JpaRepository<Diagnostico
     public List<DiagnosticoClinico> buscarPendientesDeValidar();
 
     @Query(value = "select * from diagnosticos_clinicos " +
-            " where validacion_psicologo_id is null" +
-            " and usuario_id in (select paciente_id from asignaciones_pacientes" +
-            " where psicologo_id = :psicologoId and activa = true)" +
-            " order by fecha_diagnostico asc", nativeQuery = true)
-    public List<DiagnosticoClinico> buscarPendientesDePsicologo(@Param("psicologoId") Long psicologoId);
-
-    @Query(value = "select * from diagnosticos_clinicos " +
             " where sesion_clinica_id = :sesionClinicaId" +
             " limit 1", nativeQuery = true)
     public DiagnosticoClinico buscarPorSesion(@Param("sesionClinicaId") Long sesionClinicaId);
